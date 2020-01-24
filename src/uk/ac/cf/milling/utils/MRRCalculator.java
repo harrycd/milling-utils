@@ -65,22 +65,25 @@ public class MRRCalculator {
 		
 		// Billet parameters
 		double xBilletMin = billet.getXBilletMin();
-		double xBilletMax = billet.getXBilletMax();
+//		double xBilletMax = billet.getXBilletMax();
 		double yBilletMin = billet.getYBilletMin();
-		double yBilletMax = billet.getYBilletMax();
+//		double yBilletMax = billet.getYBilletMax();
 		double zBilletMin = billet.getZBilletMin();
 		double zBilletMax = billet.getZBilletMax();
 		
-		// Number of elements in each dimension
-		int xBilletElCount = (int) (1 + (xBilletMax - xBilletMin)/elemSize);
-		int yBilletElCount = (int) (1 + (yBilletMax - yBilletMin)/elemSize);
-		int zBilletElCount = (int) (1 + (zBilletMax - zBilletMin)/elemSize);
 
-		// Initialise material removal rate and billet arrays
+		// Initialise material removal rate array
 		long[] mrr = new long[analysisFileLines];
-		boolean[][][] part = new boolean[xBilletElCount][yBilletElCount][zBilletElCount];
-		
-		
+
+		//Generate the mesh and assign it to billet.part
+		billet.generateMesh();
+
+		// Number of elements in each dimension
+		boolean[][][] part = billet.getPart();
+		int xBilletElCount = part.length;
+		int yBilletElCount = part[0].length;
+		int zBilletElCount = part[0][0].length;
+
 		// To display progress
 		JProgressBar progressBar = SettingUtils.getProgressBar();
 		int fivePerCentLine = (int) (analysisFileLines * 0.05);

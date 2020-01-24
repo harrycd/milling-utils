@@ -22,6 +22,9 @@ public class Plotter3D_V4 {
 
 		Chart chart = AWTChartComponentFactory.chart(Quality.Nicest, IChartComponentFactory.Toolkit.newt);
 		chart.getView().setBackgroundColor(Color.BLACK);
+		chart.getAxeLayout().setXTickColor(Color.YELLOW);
+		chart.getAxeLayout().setYTickColor(Color.YELLOW);
+		chart.getAxeLayout().setZTickColor(Color.YELLOW);
 		chart.getView().getAxe().getLayout().setGridColor(Color.BLACK);
 		chart.getView().getAxe().getLayout().setFaceDisplayed(false);
 		chart.getView().setSquared(false);
@@ -125,48 +128,50 @@ public class Plotter3D_V4 {
 			}
 		}
 		System.out.println("done");
+		
+		double elemSize = SettingUtils.getElementSize();
 
 		//Build bottom surface
 		Polygon polygonBottom = new Polygon();
-		polygonBottom.add(new Point(new Coord3d(0, 0, 0)), false);
-		polygonBottom.add(new Point(new Coord3d(xSize, 0, 0)), false);
-		polygonBottom.add(new Point(new Coord3d(xSize, ySize, 0)), false);
-		polygonBottom.add(new Point(new Coord3d(0, ySize, 0)), false);
+		polygonBottom.add(new Point(new Coord3d(0				, 0				, 0)), false);
+		polygonBottom.add(new Point(new Coord3d(xSize * elemSize, 0				, 0)), false);
+		polygonBottom.add(new Point(new Coord3d(xSize * elemSize, ySize*elemSize, 0)), false);
+		polygonBottom.add(new Point(new Coord3d(0				, ySize*elemSize, 0)), false);
 		polygons.add(polygonBottom);
 
 		//Build side 1
 		Polygon polygonSide1 = new Polygon();
 		for (int x = xSize-1; x >= 0; x--) {
-			polygonSide1.add(new Point(new Coord3d(x, 0, topZIndexes[x][0])), false);
+			polygonSide1.add(new Point(new Coord3d(x*elemSize			, 0		, topZIndexes[x][0] * elemSize)), false);
 		}
-		polygonSide1.add(new Point(new Coord3d(0, 0, 0)), false);
-		polygonSide1.add(new Point(new Coord3d(xSize-1, 0, 0)), false);
+			polygonSide1.add(new Point(new Coord3d(0				  	, 0		, 0)), false);
+			polygonSide1.add(new Point(new Coord3d((xSize-1)*elemSize 	, 0		, 0)), false);
 		polygons.add(polygonSide1);
 
 		//Build side 2
 		Polygon polygonSide2 = new Polygon();
 		for (int y = (ySize-1); y >= 0; y--) {
-			polygonSide2.add(new Point(new Coord3d(xSize-1, y, topZIndexes[xSize-1][y])), false);
+			polygonSide2.add(new Point(new Coord3d((xSize-1)*elemSize, y * elemSize			, topZIndexes[xSize-1][y] * elemSize)), false);
 		}
-		polygonSide2.add(new Point(new Coord3d(xSize-1, 0, 0)), false);
-		polygonSide2.add(new Point(new Coord3d(xSize-1, ySize-1, 0)), false);
+			polygonSide2.add(new Point(new Coord3d((xSize-1)*elemSize, 0					, 0)), false);
+			polygonSide2.add(new Point(new Coord3d((xSize-1)*elemSize, (ySize-1) * elemSize	, 0)), false);
 		polygons.add(polygonSide2);
 
 		//Build side 3
 		Polygon polygonSide3 = new Polygon();
 		for (int x = xSize-1; x >= 0; x--) {
-			polygonSide3.add(new Point(new Coord3d(x, ySize-1, topZIndexes[x][ySize-1])), false);
+			polygonSide3.add(new Point(new Coord3d(x*elemSize			, (ySize-1)*elemSize, 	topZIndexes[x][ySize-1]*elemSize)), false);
 		}
-		polygonSide3.add(new Point(new Coord3d(0, ySize-1, 0)), false);
-		polygonSide3.add(new Point(new Coord3d(xSize-1, ySize-1, 0)), false);
+			polygonSide3.add(new Point(new Coord3d(0					, (ySize-1)*elemSize, 									0)), false);
+			polygonSide3.add(new Point(new Coord3d((xSize-1)*elemSize	, (ySize-1)*elemSize, 									0)), false);
 		polygons.add(polygonSide3);
 
 		//Build side 4
 		Polygon polygonSide4 = new Polygon();
-		polygonSide4.add(new Point(new Coord3d(0, ySize-1, 0)), false);
-		polygonSide4.add(new Point(new Coord3d(0, 0, 0)), false);
+			polygonSide4.add(new Point(new Coord3d(0, (ySize-1)*elemSize, 							0)), false);
+			polygonSide4.add(new Point(new Coord3d(0, 0					, 							0)), false);
 		for (int y = 0; y < ySize; y++) {
-			polygonSide4.add(new Point(new Coord3d(0, y, topZIndexes[0][y])), false);
+			polygonSide4.add(new Point(new Coord3d(0, y*elemSize		,  topZIndexes[0][y]*elemSize)), false);
 		}
 		polygons.add(polygonSide4);
 		
@@ -240,8 +245,12 @@ public class Plotter3D_V4 {
 		
 		//Step 3: Construct the polygon
 		Polygon polygon = new Polygon();
+		double elemSize = SettingUtils.getElementSize();
 		for (int[] step : steps) {
-			polygon.add(new Point(new Coord3d(step[0], step[1]  , topZIndex)), false);
+			//Old implementation not considering elemSize
+			//polygon.add(new Point(new Coord3d(step[0], step[1]  , topZIndex)), false);
+			Coord3d coordinates = new Coord3d(step[0]*elemSize, step[1]*elemSize  , topZIndex*elemSize);
+			polygon.add(new Point(coordinates), false);
 		}
 		
 		
@@ -271,10 +280,20 @@ public class Plotter3D_V4 {
 	 */
 	private static Polygon convertToPolygon(int[] vertex, int topZIndex) {
 		Polygon polygon = new Polygon();
-		polygon.add(new Point(new Coord3d(vertex[0]  , vertex[1]  , topZIndex)), false);
-		polygon.add(new Point(new Coord3d(vertex[0]+1, vertex[1]  , topZIndex)), false);
-		polygon.add(new Point(new Coord3d(vertex[0]+1, vertex[1]+1, topZIndex)), false);
-		polygon.add(new Point(new Coord3d(vertex[0]  , vertex[1]+1, topZIndex)), false);
+		double elemSize = SettingUtils.getElementSize();
+		double xCoord = vertex[0] * elemSize;
+		double yCoord = vertex[1] * elemSize;
+		
+		//Old implementation not considering element Size
+//		polygon.add(new Point(new Coord3d(vertex[0]  , vertex[1]  , topZIndex)), false);
+//		polygon.add(new Point(new Coord3d(vertex[0]+1, vertex[1]  , topZIndex)), false);
+//		polygon.add(new Point(new Coord3d(vertex[0]+1, vertex[1]+1, topZIndex)), false);
+//		polygon.add(new Point(new Coord3d(vertex[0]  , vertex[1]+1, topZIndex)), false);
+
+		polygon.add(new Point(new Coord3d(xCoord  			, yCoord  		  , topZIndex * elemSize)), false);
+		polygon.add(new Point(new Coord3d(xCoord + elemSize	, yCoord  		  , topZIndex * elemSize)), false);
+		polygon.add(new Point(new Coord3d(xCoord + elemSize	, yCoord+elemSize , topZIndex * elemSize)), false);
+		polygon.add(new Point(new Coord3d(xCoord  			, yCoord+elemSize , topZIndex * elemSize)), false);
 		return polygon;
 	}
 
