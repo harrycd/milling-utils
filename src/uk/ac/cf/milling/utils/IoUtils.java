@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public class IoUtils {
 			for (int i = 0; i < titleLines; i++){
 				br.readLine();
 			}
-			
+
 			while ((line = br.readLine()) != null) {
 				String[] entry = line.split(",");
 				entries.add(entry);
@@ -49,7 +50,7 @@ public class IoUtils {
 		}
 		return entries;
 	}
-	
+
 	/**
 	 * @param filePath - Path of CSV file to read
 	 * @param startLine - File line to begin reading from (First line index is 1)
@@ -63,12 +64,12 @@ public class IoUtils {
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String line;
 			int lineNumber = 1;
-			
+
 			// Skip lines until start line
 			while (lineNumber < startLine && br.readLine() != null) {
 				lineNumber++;
 			}
-			
+
 			while ((line = br.readLine()) != null && endLine >= lineNumber++) {
 				String[] entry = line.split(",");
 				entries.add(entry);
@@ -86,13 +87,38 @@ public class IoUtils {
 	 * @return a String array containing the titles
 	 */
 	public static String[] getCSVTitles(String filePath){
-		
+
 		List<String[]> titles = readCSVFile(filePath, 1, 1);
-		
+
 		return titles.get(0);
-		
+
 	}
-	
+
+	public static String[] getCommonCSVTitles(File[] files) {
+		List<String[]> titlesList = new ArrayList<String[]>();
+		for (File file : files) {
+			titlesList.add( getCSVTitles(file) );
+		}
+
+		//Get the first array of titles and find common with the rest
+		List<String> commonTitles = new ArrayList<String>(Arrays.asList(titlesList.get(0))) ;
+		for (int i = 1; i < titlesList.size(); i++) {
+			List<String> titles = new ArrayList<String>(Arrays.asList(titlesList.get(i)));
+			commonTitles.retainAll(titles);
+		}
+
+		return commonTitles.toArray(new String[0]);
+
+	}
+
+	/**
+	 * @param file - csv file to read
+	 * @return a String array containing the titles
+	 */
+	public static String[] getCSVTitles(File file){
+		return getCSVTitles(file.getAbsolutePath());
+	}
+
 	/**
 	 * @param filePath - file path of the CSV file to read
 	 * @return a double[rows][columns] that contains values of csv. 
@@ -124,18 +150,22 @@ public class IoUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return values.toArray(new double[][] {});
-		
-//		int rowCount = values.size();
-//		int columnCount = values.get(0).length;
-//		double[][] formattedValues = new double[columnCount][rowCount];
-//		for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-//			for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
-//				formattedValues[columnIndex][rowIndex] = values.get(rowIndex)[columnIndex];
-//		}
-//
-//		return formattedValues;
+
+		//		int rowCount = values.size();
+		//		int columnCount = values.get(0).length;
+		//		double[][] formattedValues = new double[columnCount][rowCount];
+		//		for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+		//			for (int columnIndex = 0; columnIndex < columnCount; columnIndex++)
+		//				formattedValues[columnIndex][rowIndex] = values.get(rowIndex)[columnIndex];
+		//		}
+		//
+		//		return formattedValues;
+	}
+
+	public static double[][] getCSVValues(File file) {
+		return getCSVValues(file.getAbsolutePath());
 	}
 	
 	/**
@@ -150,7 +180,7 @@ public class IoUtils {
 		}
 		return new ArrayList<String>();
 	}
-	
+
 	/**
 	 * Adds a column to the end of the specified csv file
 	 * @param filePath - The path of the csv file that the column will be added
@@ -167,24 +197,24 @@ public class IoUtils {
 				newFile[i] = line + "," + column[i] + "\n"; 
 			}
 			br.close();
-			
+
 			System.out.println("File lines: " + i + " Column lines: " + column.length);
-			
+
 			//write the new file
 			BufferedWriter bw = new BufferedWriter(new FileWriter(filePath));
 			for (int it = 0; it < i; it++){
 				bw.write(newFile[it]);
 			}
 			bw.close();
-			
-			
-			
+
+
+
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Adds a column to the end of the specified CSV file
 	 * @param filePath - The path of the CSV file that the column will be added
@@ -194,12 +224,12 @@ public class IoUtils {
 	public static void addColumnToCSVFile(String filePath, String title, double[] data){
 		int fileLines = data.length + 1;
 		String[] column = new String[fileLines];
-		
+
 		column[0] = title;
 		for (int i = 1; i < fileLines; i++){
 			column[i] = String.valueOf(data[i-1]);
 		}
-		
+
 		addColumnToCSVFile(filePath, column);
 	}
 
@@ -212,16 +242,16 @@ public class IoUtils {
 	public static void addColumnToCSVFile(String filePath, String title, long[] data){
 		int fileLines = data.length + 1;
 		String[] column = new String[fileLines];
-		
+
 		column[0] = title;
 		for (int i = 1; i < fileLines; i++){
 			column[i] = String.valueOf(data[i-1]);
 		}
-		
+
 		addColumnToCSVFile(filePath, column);
 	}
-	
-	
+
+
 
 	/**
 	 * @param pathToFile - path of the .csv file to write to
@@ -260,27 +290,27 @@ public class IoUtils {
 	public static void writeCSVFile(String pathToFile, double[][] data){
 		BufferedWriter bw = null;
 		FileWriter fw = null;
-		
+
 		try {
 			fw = new FileWriter(pathToFile);
 			bw = new BufferedWriter(fw);
-			
+
 			int columns = data.length;
 			int rows = data[0].length;
-			
+
 			for (int row = 0; row < rows; row++){
 
 				String line = "";
 
 				for (int column = 0; column<columns; column++){
-				
+
 					line += data[column][row] + ",";
-					
+
 				}
 				line = line.substring(0, line.length() - 1) + "\n";
 				bw.write(line);
 			}
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -300,27 +330,27 @@ public class IoUtils {
 	public static void writeCSVFile(String pathToFile, int[][] data){
 		BufferedWriter bw = null;
 		FileWriter fw = null;
-		
+
 		try {
 			fw = new FileWriter(pathToFile);
 			bw = new BufferedWriter(fw);
-			
+
 			int columns = data.length;
 			int rows = data[0].length;
-			
+
 			for (int row = 0; row < rows; row++){
-				
+
 				String line = "";
-				
+
 				for (int column = 0; column<columns; column++){
-					
+
 					line += data[column][row] + ",";
-					
+
 				}
 				line = line.substring(0, line.length() - 1) + "\n";
 				bw.write(line);
 			}
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -332,9 +362,9 @@ public class IoUtils {
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Writes to the specified output file deleting previous contents
 	 * @param outputFilePath - the filepath of the output file
@@ -350,9 +380,9 @@ public class IoUtils {
 			e.printStackTrace();
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * @param entry - The values of the attributes to concatenate separated by comma
 	 * @return the produced string of comma separated attributes
@@ -365,7 +395,7 @@ public class IoUtils {
 		line = line.substring(0, line.length()-1);
 		return line;
 	}
-	
+
 	/**
 	 * @param folderPath - Folder path containing the files to look for
 	 * @param fileExtention - Extension of the files to look for
@@ -375,18 +405,18 @@ public class IoUtils {
 		List<String> fileNames = new ArrayList<String>();
 		final File folder = new File(folderPath);
 		for (final File fileEntry : folder.listFiles()) {
-	        if (fileEntry.isDirectory()) continue;
-	        String fileName = fileEntry.getName();
-	        
-	        int beginIndex = fileName.length() - fileExtention.length();
-	        int endIndex = fileName.length();
-	        if (fileName.substring(beginIndex, endIndex).equals(fileExtention)){
-	        	fileNames.add(fileName);
-	        }
-	    }
+			if (fileEntry.isDirectory()) continue;
+			String fileName = fileEntry.getName();
+
+			int beginIndex = fileName.length() - fileExtention.length();
+			int endIndex = fileName.length();
+			if (fileName.substring(beginIndex, endIndex).equals(fileExtention)){
+				fileNames.add(fileName);
+			}
+		}
 		return fileNames;
 	}
-	
+
 	/**
 	 * @param filePath - path to the file to check if exists
 	 * @return true if file exists, false if not or if it is a directory

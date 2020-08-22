@@ -28,9 +28,9 @@ public class MRRCalculator {
 		Billet billet = config.getBillet();
 		//These are the columns of the temporary file parsed separately.
 		float[] timePoints = kpis.getTimePoints();
-		double[] xTools = kpis.getToolX(); 
-		double[] yTools = kpis.getToolY(); 
-		double[] zTools = kpis.getToolZ();
+		double[] xSpindles = kpis.getToolX(); 
+		double[] ySpindles = kpis.getToolY(); 
+		double[] zSpindles = kpis.getToolZ();
 		double[] spindleSpeed = kpis.getSpindleSpeed();
 		
 		String[] carouselPocketIds = kpis.getCarouselPocketId(); //The position on the carousel (not the actual carouselPocketId)
@@ -95,9 +95,9 @@ public class MRRCalculator {
 		
 		float timePoint = 0;//Current point in time (seconds from process start)
 		float timeDiff = 0;	//The difference between current and previous time point
-		double xTool = 0; 	//The x coordinate of the tool
-		double yTool = 0; 	//The y coordinate of the tool
-		double zTool = 0; 	//The z coordinate of the tool
+		double xSpindle = 0; 	//The x coordinate of the tool
+		double ySpindle = 0; 	//The y coordinate of the tool
+		double zSpindle = 0; 	//The z coordinate of the tool
 		
 		double dxTool = 0; 	//The x axis difference between previous and current position 
 		double dyTool = 0; 	//The y axis difference between previous and current position 
@@ -121,12 +121,12 @@ public class MRRCalculator {
 			timeDiff = timePoints[line] - timePoint; //timePoint here has the previous value
 			timePoint = timePoints[line];
 			//To avoid checking if current is the 1st line, value of xyzTool is used to represent the previous
-			dxTool = xTools[line] - xTool; 
-			dyTool = yTools[line] - yTool;
-			dzTool = Math.abs(zTools[line] - zTool);
-			xTool = xTools[line]; 
-			yTool = yTools[line]; 
-			zTool = zTools[line];
+			dxTool = xSpindles[line] - xSpindle; 
+			dyTool = ySpindles[line] - ySpindle;
+			dzTool = Math.abs(zSpindles[line] - zSpindle);
+			xSpindle = xSpindles[line]; 
+			ySpindle = ySpindles[line]; 
+			zSpindle = zSpindles[line];
 			
 			dxyzTool = Math.sqrt(dxTool*dxTool + dyTool*dyTool + dzTool*dzTool);
 			radialRatio = dzTool / dxyzTool;
@@ -161,7 +161,9 @@ public class MRRCalculator {
 			}
 			
 			//Check if tool has reached the billet. If not continue to next block
-			if (zTool > zBilletMax) continue;
+			//The nose of the tool is below zTool
+			double zToolNoseCoord = zSpindle - cuttingToolAxialProfile.get(cuttingToolAxialProfile.size() -1).getDistanceFromNose();
+			if ( zToolNoseCoord > zBilletMax) continue;
 			
 			// Iterate over every z coordinate of tool
 			// Declaring variables outside the loop to improve performance
@@ -174,7 +176,7 @@ public class MRRCalculator {
 			double yToolCoordMin = 0; 	// the min y coordinate of tool at the examined z coordinate
 			double yToolCoordMax = 0; 	// the max y coordinate of tool at the examined z coordinate
 			
-			double zToolElCoord = zTool;	// z coordinate of the element to examine if it machines the billet
+			double zToolElCoord = zSpindle;	// z coordinate of the element to examine if it machines the billet
 //			double zToolCoordMin = toolZ;	// the min z coordinate of tool the examined tool position
 //			double zToolCoordMax = toolZ + toolAxialProfile.get(toolAxialProfile.size()-1).getDistanceFromBase();	// the max z coordinate of tool at the examined tool position
 			
@@ -186,26 +188,26 @@ public class MRRCalculator {
 			int yPartEl = 0; // Y position of the part's element
 			int zPartEl = 0; // Z position of the part's element
 
-			for (int zToolEl = 0; zToolEl < zToolElCount; zToolEl++, zToolElCoord += elemSize){
+			for (int zToolEl = 0; zToolEl < zToolElCount; zToolEl++, zToolElCoord -= elemSize){
 				//radius of the tool at this specific z coordinate
 				toolLocalRadius = cuttingToolAxialProfile.get(zToolEl).getDistanceFromCentre();
 				
 				//look if for the specified z coordinate, the billet elements fall within the tool elements
 				//Initially, a square profile of the tool is created and if the billet falls within the square limits
 				//more detailed search is done to check if it falls within circle limits.
-				xToolCoordMin = xTool - toolLocalRadius;
-				xToolCoordMax = xTool + toolLocalRadius;
+				xToolCoordMin = xSpindle - toolLocalRadius;
+				xToolCoordMax = xSpindle + toolLocalRadius;
 				xToolElCoord = xToolCoordMin; //resets the coordinate to min when restarting iteration
 
-				yToolCoordMin = yTool - toolLocalRadius;
-				yToolCoordMax = yTool + toolLocalRadius;
+				yToolCoordMin = ySpindle - toolLocalRadius;
+				yToolCoordMax = ySpindle + toolLocalRadius;
 				yToolElCoord = yToolCoordMin; //resets the coordinate to min when restarting iteration
 				
 
 				while (xToolElCoord <= xToolCoordMax){
 					while (yToolElCoord <= yToolCoordMax){
-						xDistFromToolCentre = xToolElCoord - xTool;
-						yDistFromToolCentre = yToolElCoord - yTool;
+						xDistFromToolCentre = xToolElCoord - xSpindle;
+						yDistFromToolCentre = yToolElCoord - ySpindle;
 						radialDistFromToolCentre = xDistFromToolCentre * xDistFromToolCentre + yDistFromToolCentre * yDistFromToolCentre; //SQRT is not needed because x > y => sqrt(x) > sqrt(y) when x,y > 0
 						if ((radialDistFromToolCentre) <= toolLocalRadius * toolLocalRadius){ //Check if within tool radius
 							xPartEl = (int) ((xToolElCoord - xBilletMin)/elemSize);
