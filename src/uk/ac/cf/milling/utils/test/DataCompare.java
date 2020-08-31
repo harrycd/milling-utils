@@ -7,7 +7,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import uk.ac.cf.milling.utils.MLUtils;
+import uk.ac.cf.milling.utils.simulation.MLUtils;
 
 /**
  * @author Theocharis Alexopoulos

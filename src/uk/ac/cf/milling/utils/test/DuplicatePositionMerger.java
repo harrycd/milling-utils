@@ -4,8 +4,8 @@
 package uk.ac.cf.milling.utils.test;
 
 import uk.ac.cf.milling.objects.KPIs;
-import uk.ac.cf.milling.utils.DataFileUtils;
-import uk.ac.cf.milling.utils.IoUtils;
+import uk.ac.cf.milling.utils.data.DataFileUtils;
+import uk.ac.cf.milling.utils.data.IoUtils;
 
 /**
  * @author Theocharis Alexopoulos
