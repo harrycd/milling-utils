@@ -202,10 +202,11 @@ public class Plotter2D {
 		}
 
 		Chart2d chart = new Chart2d();
+		new ChartXZoomController(chart);
 
 		Serie2d series = chart.getSerie(title, Serie2d.Type.LINE);
 
-		Color colorReference = new Color(0, 0, 200);
+		Color colorReference = new Color(0, 0, 0);
 		Color colorDatasets = new Color(200, 0, 0);
 
 
@@ -218,12 +219,8 @@ public class Plotter2D {
 		}
 		title += " sma" + sma;
 
-		// First add the reference dataset
-		for (int i = 0; i < referenceDataset.length; i++){
-			series.add(new Coord2d(i, referenceDataset[i]), colorReference);
-		}
 
-		// Add remaining datasets with different colour
+		// Add datasets
 		for (int datasetIndex = 0; datasetIndex < datasets.size(); datasetIndex++) {
 			int[][] relation = relations.get(datasetIndex);
 			double[] dataset = datasets.get(datasetIndex);
@@ -231,6 +228,11 @@ public class Plotter2D {
 			for (int i = 0; i < relation[0].length; i++){
 				series.add(new Coord2d(relation[0][i], dataset[relation[1][i]]), colorDatasets);
 			}
+		}
+
+		// Last add the reference dataset so it is printed over the previous lines
+		for (int i = 0; i < referenceDataset.length; i++){
+			series.add(new Coord2d(i, referenceDataset[i]), colorReference);
 		}
 
 		return Plotter2D.getChartPanel(chart);

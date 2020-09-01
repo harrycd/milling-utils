@@ -3,7 +3,14 @@
  */
 package uk.ac.cf.milling.utils.plotting;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
+
+import org.jzy3d.chart.Chart;
 
 import uk.ac.cf.milling.objects.Billet;
 
@@ -29,8 +36,8 @@ public class Plotter3D {
 		return Plotter3D_V4.getChartPanel(part);
 	}
 	
-//	public static JPanel getParameterColourMapPanel(double toolCoordinates, String paramName, double[] paramValues) {
-//		
-//	}
+	public static JPanel getParameterColourMapPanel(double[][] toolCoordinates, String paramName, double[] paramValues) {
+		return Parameter3DColourMap.getParameter3DColourMap(toolCoordinates, paramName, paramValues);
+	}
 
 }

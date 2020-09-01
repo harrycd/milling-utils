@@ -44,7 +44,7 @@ public class Plotter3D_V4 {
 		//		Coord3d lightP, lightPosition);
 
 		//TODO add shift in all dimensions
-		new NewtCameraMouseControllerZoom(chart);
+		new ChartXYZZoom(chart);
 		chart.addKeyboardCameraController();
 
 

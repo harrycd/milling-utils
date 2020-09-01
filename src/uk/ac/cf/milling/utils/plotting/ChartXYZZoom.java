@@ -19,14 +19,14 @@ import com.jogamp.newt.event.MouseListener;
  * @author Theocharis Alexopoulos
  *
  */
-public class NewtCameraMouseControllerZoom extends AbstractCameraController implements MouseListener{
+public class ChartXYZZoom extends AbstractCameraController implements MouseListener{
 	
 	Chart chart;
 	
-	public NewtCameraMouseControllerZoom(){
+	public ChartXYZZoom(){
 	}
 	
-	public NewtCameraMouseControllerZoom(Chart chart){
+	public ChartXYZZoom(Chart chart){
 	    this.chart = chart;
 		register(chart);
 		addSlaveThreadController(new CameraThreadController(chart));
