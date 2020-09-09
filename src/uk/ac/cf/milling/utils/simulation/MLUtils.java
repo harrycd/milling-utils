@@ -23,6 +23,7 @@ import com.util.DistanceFunctionFactory;
 
 import uk.ac.cf.milling.objects.CuttingTool;
 import uk.ac.cf.milling.objects.LearningSet;
+import uk.ac.cf.milling.utils.data.DataManipulationUtils;
 import uk.ac.cf.milling.utils.data.IoUtils;
 import uk.ac.cf.milling.utils.db.CarouselUtils;
 import uk.ac.cf.milling.utils.db.LearningSetUtils;
@@ -166,7 +167,7 @@ public class MLUtils {
 		int targetIndex = IoUtils.getCSVTitleIndex(dataFilePath, targetName);
 		int toolIndex = IoUtils.getCSVTitleIndex(dataFilePath, "T");
 		double[][] values = IoUtils.getCSVValues(dataFilePath);	//  values[samples][titles]
-		values = IoUtils.transposeArrayValues(values); // values[titles][samples]
+		values = DataManipulationUtils.transpose2DArrayValues(values); // values[titles][samples]
 		
 		//find the carousel positions used (to retrieve relevant cutting tools) 
 		double[] carouselPositions = Arrays.stream(values[toolIndex]).distinct().toArray();
@@ -244,7 +245,7 @@ public class MLUtils {
 	 */
 	private static void trainLearningSet(double[] targetValuesPart, String[] inputNames, double[][] inputValuesPart, LearningSet learningSet) 
 	{
-		inputValuesPart = IoUtils.transposeArrayValues(inputValuesPart); //values[samples][titles]
+		inputValuesPart = DataManipulationUtils.transpose2DArrayValues(inputValuesPart); //values[samples][titles]
 		
 		// Remove samples where target = 0 (to avoid 0 = a*0 + c) 
 		int cleanTargetLength = 0;

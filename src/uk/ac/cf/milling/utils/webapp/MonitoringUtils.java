@@ -13,7 +13,7 @@ import org.json.simple.JSONObject;
 import uk.ac.cf.milling.objects.CuttingTool;
 import uk.ac.cf.milling.objects.KPIs;
 import uk.ac.cf.milling.objects.Nc;
-import uk.ac.cf.milling.utils.data.DataFileUtils;
+import uk.ac.cf.milling.utils.data.DataManipulationUtils;
 import uk.ac.cf.milling.utils.db.CarouselUtils;
 import uk.ac.cf.milling.utils.db.NcUtils;
 
@@ -39,8 +39,8 @@ public class MonitoringUtils {
 		System.out.println("NC id:" + ncId);
 		System.out.println("Theor file:" + nc.getAnalysisPath());
 		System.out.println("Monit file:" + nc.getMonitoringPath());
-		KPIs kpiTh = DataFileUtils.parseDataFile(nc.getAnalysisPath());
-		KPIs kpiMon = DataFileUtils.parseDataFile(nc.getMonitoringPath());
+		KPIs kpiTh = DataManipulationUtils.parseDataFile(nc.getAnalysisPath());
+		KPIs kpiMon = DataManipulationUtils.parseDataFile(nc.getMonitoringPath());
 		float[] timeMon = kpiMon.getTimePoints();
 		float[] timeTh = kpiTh.getTimePoints();
 		double[] xCoord = kpiMon.getToolX();

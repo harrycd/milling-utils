@@ -37,7 +37,7 @@ public class Plotter3D {
 	}
 	
 	public static JPanel getParameterColourMapPanel(double[][] toolCoordinates, String paramName, double[] paramValues) {
-		return Parameter3DColourMap.getParameter3DColourMap(toolCoordinates, paramName, paramValues);
+		return ColourScatter3D.getParameter3DColourMap(toolCoordinates, paramName, paramValues);
 	}
 
 }

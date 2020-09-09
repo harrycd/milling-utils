@@ -15,7 +15,7 @@ import uk.ac.cf.milling.utils.db.SettingUtils;
  * @author Theocharis Alexopoulos
  *
  */
-public class DataFileUtils {
+public class DataManipulationUtils {
 	/**
 	 * @param kpis
 	 * @return an array containing min and max Non Zero value of tool path.
@@ -367,7 +367,7 @@ public class DataFileUtils {
 	 * It recalculates all other data parameters
 	 */
 	public static void cleanDuplicateCoordinates(String filePath) {
-		KPIs kpis = DataFileUtils.parseDataFile(filePath);
+		KPIs kpis = DataManipulationUtils.parseDataFile(filePath);
 		double[] x = kpis.getToolX();
 		double[] y = kpis.getToolY();
 		double[] z = kpis.getToolZ();
@@ -585,34 +585,30 @@ public class DataFileUtils {
 	}
 
 	/**
-	 * @param array - a double[][] array to be transposed
-	 * @return the transposed array. 
-	 * As every array[index] may have different length the missing values are 0.0
+	 * @param values - a double[][] array
+	 * @return the double[][] transpose of the input array
 	 */
-	public static double[][] transpose2dArray(double[][] array){
-		int dim1Length = array.length;
-		int dim2Length = 0;
-		
-		if (dim1Length > 0) {
-			for (int i = 0; i < dim1Length; i++) {
-				if (array[i].length > dim2Length) {
-					dim2Length = array[i].length; 
+	public static double[][] transpose2DArrayValues(double[][] values){
+		double[][] transpose = null;
+		try {
+			if (values == null || values[0] == null) 
+				throw new Exception("The source array is null or empty");
+
+			int rows = values.length;
+			int columns = values[0].length;
+
+			transpose = new double[columns][rows];
+			
+			for (int row = 0; row < rows; row++) {
+				for (int column = 0; column < columns; column++) {
+					transpose[column][row] = values[row][column];
 				}
 			}
-		} else {
-			return null;
+
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
-		double[][] transposed = new double[dim2Length][dim1Length];
-		
-		for (int i = 0; i < dim1Length; i++) {
-			for (int j = 0; j < array[i].length; j++) {
-				transposed[j][i] = array[i][j];
-			}
-		}
-		
-		return transposed;
-		
+		return transpose;
 	}
 	
 	/**

@@ -4,7 +4,7 @@
 package uk.ac.cf.milling.utils.test;
 
 import uk.ac.cf.milling.objects.KPIs;
-import uk.ac.cf.milling.utils.data.DataFileUtils;
+import uk.ac.cf.milling.utils.data.DataManipulationUtils;
 import uk.ac.cf.milling.utils.data.IoUtils;
 
 /**
@@ -23,7 +23,7 @@ public class DuplicatePositionMerger {
 	}
 	
 	public static void cleanDataFile(String filePath) {
-		KPIs kpis = DataFileUtils.parseDataFile(filePath);
+		KPIs kpis = DataManipulationUtils.parseDataFile(filePath);
 		double[] x = kpis.getToolX();
 		double[] y = kpis.getToolY();
 		double[] z = kpis.getToolZ();

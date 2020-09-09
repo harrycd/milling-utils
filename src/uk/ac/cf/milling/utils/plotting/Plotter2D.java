@@ -95,6 +95,7 @@ public class Plotter2D {
 		title += " diff";
 		//Plot the spindle load diff
 		Chart2d chart = new Chart2d();
+		new ChartXZoomController(chart);
 
 		Serie2d sirie = chart.getSerie(title, Serie2d.Type.LINE);
 
@@ -147,6 +148,7 @@ public class Plotter2D {
 	public static JPanel generatePlots(int[][] relation, double[] values0, double[] values1, String title, int sma, String xAxisTitle, String yAxisTitle){
 		//Plot the spindle load
 		Chart2d chart = new Chart2d();
+		new ChartXZoomController(chart);
 
 		Serie2d serie = chart.getSerie(title, Serie2d.Type.LINE);
 

@@ -132,9 +132,11 @@ public class ChartXYZZoom extends AbstractCameraController implements MouseListe
 	@Override
     public void mouseWheelMoved(MouseEvent e) {
 		stopThreadController();
-		float factor = ((e.getRotation()[1]*e.getRotationScale()));
-		
 		BoundingBox3d bounds = chart.getView().getBounds();
+		BoundingBox3d previousBounds = new BoundingBox3d(bounds);
+		float radius = (float) bounds.getRadius();
+		float factor = ((e.getRotation()[1]*0.05f*radius));
+		
 		bounds.setXmin(bounds.getXmin() - factor);
         bounds.setXmax(bounds.getXmax() + factor);
         
@@ -144,8 +146,11 @@ public class ChartXYZZoom extends AbstractCameraController implements MouseListe
         bounds.setZmin(bounds.getZmin() - factor);
         bounds.setZmax(bounds.getZmax() + factor);
         
-        if(bounds.getXmin() < bounds.getXmax() || bounds.getYmin() < bounds.getYmax() || bounds.getZmin() < bounds.getZmax() )
+        if(bounds.getXmin() < bounds.getXmax() && bounds.getYmin() < bounds.getYmax() && bounds.getZmin() < bounds.getZmax() ) {
         	chart.getView().lookToBox(bounds);
+        } else {
+        	chart.getView().setBoundManual(previousBounds);
+        }
 		
 	}
 	

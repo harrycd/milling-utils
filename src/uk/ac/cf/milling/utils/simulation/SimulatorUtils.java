@@ -8,7 +8,7 @@ import java.util.List;
 import uk.ac.cf.milling.objects.KPIs;
 import uk.ac.cf.milling.objects.Nc;
 import uk.ac.cf.milling.objects.SimulatorConfig;
-import uk.ac.cf.milling.utils.data.DataFileUtils;
+import uk.ac.cf.milling.utils.data.DataManipulationUtils;
 import uk.ac.cf.milling.utils.data.GCodeAnalyser;
 import uk.ac.cf.milling.utils.data.GCodeAnalyserUGS;
 import uk.ac.cf.milling.utils.data.IoUtils;
@@ -46,7 +46,7 @@ public class SimulatorUtils {
 
 						// Parse the analysis file
 						System.out.print("Parsing Analysis File...");
-		KPIUtils.updateKPIs(kpis, DataFileUtils.parseDataFile(inputFilePath));
+		KPIUtils.updateKPIs(kpis, DataManipulationUtils.parseDataFile(inputFilePath));
 						System.out.println("done");
 						System.out.println("GCode analysed in " + kpis.getTimePoints().length + " steps.");
 						
@@ -86,18 +86,18 @@ public class SimulatorUtils {
 						//Clean the file from duplicates
 						System.out.print("Cleaning Analysis File...");
 		String analysisFilePath  = config.getInputFilePath();
-		DataFileUtils.cleanDuplicateCoordinates(analysisFilePath);
+		DataManipulationUtils.cleanDuplicateCoordinates(analysisFilePath);
 						System.out.println("done");
 						
 						//Interpolate points to create a continuous toolpath
 						System.out.print("Interpolating toolpath points...");
-		DataFileUtils.interpolateToolpathPoints(analysisFilePath);
+		DataManipulationUtils.interpolateToolpathPoints(analysisFilePath);
 		analysisFilePath = analysisFilePath.substring(0, analysisFilePath.length() - 4) + "_smooth.csv";
 						System.out.println("done");
 						
 						// Parse the analysis file
 						System.out.print("Parsing Analysis File...");
-		KPIUtils.updateKPIs(kpis, DataFileUtils.parseDataFile(analysisFilePath));
+		KPIUtils.updateKPIs(kpis, DataManipulationUtils.parseDataFile(analysisFilePath));
 						System.out.println("done");
 						System.out.println("GCode analysed in " + kpis.getTimePoints().length + " steps.");
 
@@ -124,19 +124,19 @@ public class SimulatorUtils {
 				//Clean the file from duplicates
 				System.out.print("Cleaning Analysis File...");
 		String csvFilePath = config.getInputFilePath();
-		DataFileUtils.cleanDuplicateCoordinates(csvFilePath);
+		DataManipulationUtils.cleanDuplicateCoordinates(csvFilePath);
 		csvFilePath += "_clean.csv";
 				System.out.println("done");
 				
 				//Interpolate points to create a continuous toolpath
 				System.out.print("Interpolating toolpath points...");
-		DataFileUtils.interpolateToolpathPoints(csvFilePath);
+		DataManipulationUtils.interpolateToolpathPoints(csvFilePath);
 		csvFilePath = csvFilePath.substring(0, csvFilePath.length() - 4) + "_smooth.csv";
 				System.out.println("done");
 		
 				// Parse the analysis file
 				System.out.print("Parsing CSV File...");
-		KPIUtils.updateKPIs(kpis, DataFileUtils.parseDataFile(csvFilePath));
+		KPIUtils.updateKPIs(kpis, DataManipulationUtils.parseDataFile(csvFilePath));
 				System.out.println("done");
 				System.out.println("Data file contains " + kpis.getTimePoints().length + " steps.");
 		
@@ -167,7 +167,7 @@ public class SimulatorUtils {
 	public static KPIs simulateJacobFile(KPIs kpis, SimulatorConfig config){
 						// Parse the data file
 						System.out.println("Parsing the data file...");
-		kpis = DataFileUtils.parseDataFile(config.getInputFilePath());
+		kpis = DataManipulationUtils.parseDataFile(config.getInputFilePath());
 						System.out.println("done");
 						
 						// Calculate material removal rate

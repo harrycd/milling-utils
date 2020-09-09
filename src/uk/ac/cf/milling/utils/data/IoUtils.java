@@ -165,33 +165,6 @@ public class IoUtils {
 	}
 	
 	/**
-	 * @param values - a double[][] array
-	 * @return the double[][] transpose of the input array
-	 */
-	public static double[][] transposeArrayValues(double[][] values){
-		double[][] transpose = null;
-		try {
-			if (values == null || values[0] == null) 
-				throw new Exception("The source array is null or empty");
-
-			int rows = values.length;
-			int columns = values[0].length;
-
-			transpose = new double[columns][rows];
-			
-			for (int row = 0; row < rows; row++) {
-				for (int column = 0; column < columns; column++) {
-					transpose[column][row] = values[row][column];
-				}
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return transpose;
-	}
-	
-	/**
 	 * @param csvFilePath - path to the CSV file
 	 * @param title - title to find index of
 	 * @return the index of the specified title (counting from 0)
