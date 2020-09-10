@@ -134,7 +134,7 @@ public class IoUtils {
 			//read all lines
 
 			while ((line = br.readLine()) != null) {
-				if (line.matches("[\\d+[,\\.]]+[\\n|\\r]*")) {//is number separated by , or .
+				if (line.matches("[-?\\d+[,\\.]]+[\\n|\\r]*")) {//is number separated by , or .
 					String[] lineData = line.split(",");
 					double[] lineValues = new double[lineData.length];
 					int it=0;
