@@ -622,5 +622,19 @@ public class DataManipulationUtils {
 		}
 		return indexes;
 	}
+	
+	 /**
+	 * @param arr - array containing String values
+	 * @param val - the value to find in the Array
+	 * @return true if array contains the provided value
+	 */
+	public static boolean containsEqual(String arr[], String val)
+	   {
+	      for (int i = 0; i < arr.length; i++)
+	         if (arr[i].equals(val))
+	            return true;
+
+	      return false;
+	   }
 
 }
