@@ -636,5 +636,50 @@ public class DataManipulationUtils {
 
 	      return false;
 	   }
+	
+	/**
+	 * @param values - double array with original values
+	 * @param averagingPeriod - number of samples to calculate the average from
+	 * @return a new double array containing the CMA
+	 */
+	public static double[] getCenteredMovingAverage(double[] values, int averagingPeriod) {
+		return getDisplacedMovingAverage(values, averagingPeriod, (int) -averagingPeriod/2);
+	}
+	
+	/**
+	 * @param values - double array with original values
+	 * @param averagingPeriod - number of samples to calculate the average from
+	 * @param displacement - shift of moving average
+	 * @return a new double array containing the DMA 
+	 */
+	public static double[] getDisplacedMovingAverage(double[] values, int averagingPeriod, int displacement) {
+		values = getSimpleMovingAverage(values, averagingPeriod);
+		int vLength = values.length;
+		double[] dma = new double[vLength];
+		int srcPos = averagingPeriod -1;
+		int destPos = srcPos + displacement;
+		int copyLength = (displacement > 0) ? vLength-srcPos-displacement : vLength-srcPos;
+		System.arraycopy(values, srcPos, dma, destPos, copyLength);
+		
+		return dma;
+	}
+	
+	/**
+	 * @param values - a double array with original values
+	 * @param averagingPeriod - number of samples used to calculate the average
+	 * @return a double array with the smoothened values
+	 */
+	public static double[] getSimpleMovingAverage(double[] values, int averagingPeriod) {
+		int length = values.length;
+		double[] sma = new double[length];
+		//Calculate the sma
+		for (int i = averagingPeriod-1; i < length; i++){
+			for (int j = 0; j < averagingPeriod; j++){
+				sma[i] += values[i-j];
+			}
+			sma[i] /= averagingPeriod;
+		}
+		return sma;
+	}
 
 }

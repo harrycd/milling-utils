@@ -73,6 +73,12 @@ public class ColourScatter3D {
         		g = (float) ((-value/maxValue) + 1);
         		b = 0;
         	}
+        	//TODO remove graying zeros
+        	if (value == 0) {
+        		r = 0.8f;
+        		g = 0.8f;
+        		b = 0.8f;
+        	}
         	colors[i] = new Color(r, g, b, 1.0f);
         }
 /*		
@@ -102,9 +108,14 @@ public class ColourScatter3D {
 		
 		//Add zoom and shift functionality
 		new ChartXYZZoom(chart);
-		chart.addKeyboardCameraController();		
+		chart.addKeyboardCameraController();
 		
-		return getChartPanel(chart);
+		JPanel panel = getChartPanel(chart);
+		panel.putClientProperty("scatter", scatter);
+		panel.putClientProperty("colours", colors);
+		panel.putClientProperty("coordinates", points);
+		
+		return panel;
 	}
 	
 	private static JPanel getChartPanel(Chart chart) {

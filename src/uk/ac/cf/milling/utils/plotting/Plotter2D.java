@@ -24,6 +24,8 @@ import org.jzy3d.plot2d.primitives.Serie2d;
 import org.jzy3d.plot3d.primitives.axes.layout.providers.SmartTickProvider;
 import org.jzy3d.plot3d.rendering.view.modes.ViewBoundMode;
 
+import uk.ac.cf.milling.utils.data.DataManipulationUtils;
+
 /**
  * A frame to show a list of charts
  * @author Theocharis Alexopoulos
@@ -63,23 +65,41 @@ public class Plotter2D {
 	 * @param dataY
 	 * @return
 	 */
-	public static JPanel get2dPlotPanel(float[] dataX, double[] dataY) {
-		Chart chart = get2dPlot(dataX, dataY);
-		//		chart.stopAnimator();
-		JPanel chartPanel = getChartPanel(chart); 
-		return chartPanel;
-	}
+//	public static JPanel get2dPlotPanel(String seriesTitle, float[] dataX, float[] dataY) {
+//		Chart chart = get2dPlot(seriesTitle, dataX, dataY);
+//		chart.getAxeLayout().setYAxeLabel(seriesTitle);
+//		//		chart.stopAnimator();
+//		JPanel chartPanel = getChartPanel(chart); 
+//		return chartPanel;
+//	}
 
 	/**
+	 * @param seriesTitle
 	 * @param dataX
 	 * @param dataY
 	 * @return
 	 */
-	public static JPanel get2dPlotPanel(double[] dataX, double[] dataY) {
-		Chart chart = get2dPlot(dataX, dataY);
+	public static JPanel get2dPlotPanel(String seriesTitle, float[] dataX, float[] dataY) {
+		Chart chart = get2dPlot(seriesTitle, dataX, dataY);
+		chart.getAxeLayout().setYAxeLabel(seriesTitle);
 		//		chart.stopAnimator();
 		JPanel chartPanel = getChartPanel(chart); 
 		PlotterUtils.registerChart(chartPanel, chart);
+		return chartPanel;
+	}
+
+	/**
+	 * @param seriesData
+	 * @return
+	 */
+	public static JPanel get2dPlotPanel(String seriesTitle, float[] seriesData) {
+		Chart2d chart = get2dPlot(seriesTitle, seriesData);
+		chart.getAxeLayout().setYAxeLabel(seriesTitle);
+		//		chart.stopAnimator();
+		JPanel chartPanel = getChartPanel(chart); 
+		PlotterUtils.registerChart(chartPanel, chart);
+		chartPanel.putClientProperty("series", chart.getSerie(seriesTitle, null));
+		chartPanel.putClientProperty("data", seriesData);
 		return chartPanel;
 	}
 
@@ -115,7 +135,7 @@ public class Plotter2D {
 
 		//Smoothen the values
 		if (sma > 1){
-			yPoints = smoothen(yPoints, sma);
+			yPoints = DataManipulationUtils.getSimpleMovingAverage(yPoints, sma);
 			title += " sma" + sma;
 		}
 
@@ -132,10 +152,6 @@ public class Plotter2D {
 
 		return Plotter2D.getChartPanel(chart);
 	}
-
-
-
-
 
 	/**
 	 * Add a plot in results that shows 2 curves, one for each dataset
@@ -158,8 +174,8 @@ public class Plotter2D {
 
 		//If moving average is > 1 then smoothen the values
 		if (sma > 1) {
-			values0 = smoothen(values0, sma);
-			values1 = smoothen(values1, sma);
+			values0 = DataManipulationUtils.getSimpleMovingAverage(values0, sma);
+			values1 = DataManipulationUtils.getSimpleMovingAverage(values1, sma);
 			title += " sma" + sma;  
 		}
 
@@ -214,9 +230,9 @@ public class Plotter2D {
 
 		//If moving average is > 1 then smoothen the values
 		if (sma > 1) {
-			referenceDataset = smoothen(referenceDataset, sma);
+			referenceDataset = DataManipulationUtils.getSimpleMovingAverage(referenceDataset, sma);
 			for (double[] dataset:datasets) {
-				dataset = smoothen(dataset, sma);
+				dataset = DataManipulationUtils.getSimpleMovingAverage(dataset, sma);
 			}
 		}
 		title += " sma" + sma;
@@ -240,60 +256,97 @@ public class Plotter2D {
 		return Plotter2D.getChartPanel(chart);
 	}
 
-
 	/**
-	 * @param values - a double array to smoothen
-	 * @param movingAverage - the simple moving average to use
-	 * @return a double array with the smoothened values
-	 */
-	private static double[] smoothen(double[] values, int movingAverage) {
-		int length = values.length;
-		double[] valuesSmooth = new double[length];
-		//Smoothen the values
-		for (int i = movingAverage; i < length; i++){
-			for (int j = 0; j < movingAverage; j++){
-				valuesSmooth[i] += values[i-j];
-			}
-			valuesSmooth[i] /= movingAverage;
-		}
-		return valuesSmooth;
-	}
-
-
-
-	/**
-	 * @param dataY - a long[] array containing the data to plot
+	 * @param seriesTitle
+	 * @param seriesData - a long[] array containing the data to plot
 	 * @return a chart containing a plot of provided points with x axis distance = 1
 	 */
-	public static Chart2d get2dPlot(long[] dataY){
+	public static Chart2d get2dPlot(String seriesTitle, float[] seriesData){
 		Chart2d chart = new Chart2d();
-		Serie2d series = chart.getSerie("series", Serie2d.Type.LINE);
-		int length = dataY.length;
-		for (int i = 0; i < length; i++){
-			series.add(i, dataY[i]);
-		}
-		series.setColor(Color.BLUE);
+		Serie2d series = chart.getSerie(seriesTitle, Serie2d.Type.LINE);
+		series = populateSeries(series, seriesData);
 		return chart;
 	}
+
+	/**
+	 * @param series
+	 * @param seriesData
+	 * @return 
+	 */
+	public static Serie2d populateSeries(Serie2d series, float[] seriesData) {
+		int length = seriesData.length;
+		for (int i = 0; i < length; i++){
+			series.add(i, seriesData[i]);
+		}
+		series.setColor(Color.BLUE);
+
+		return series;
+	}
+
+	//	/**
+	//	 * @param dataY - a double[] array containing the data to plot
+	//	 * @return a chart containing a plot of provided points with x axis distance = 1
+	//	 */
+	//	public static Chart2d get2dPlot(String seriesTitle, double[] dataY){
+	//		Chart2d chart = new Chart2d();
+	//		Serie2d series = chart.getSerie(seriesTitle, Serie2d.Type.LINE);
+	//		int length = dataY.length;
+	//		for (int i = 0; i < length; i++){
+	//			series.add(i, dataY[i]);
+	//		}
+	//		series.setColor(Color.BLUE);
+	//		return chart;
+	//	}
 
 	/**
 	 * @param dataX - a long[] containing the x axis data
 	 * @param dataY - a long[] containing the y axis data
 	 * @return a chart where the input data sets have been plotted
 	 */
-	public static Chart2d get2dPlot(long[] dataX, long[] dataY){
+	//	public static Chart2d get2dPlot(float[] dataX, long[] dataY){
+	//		Chart2d chart = new Chart2d();
+	//		if (dataX.length != dataY.length){
+	//			System.out.println("The data arrays do not match (different length)");
+	//			return chart;
+	//		}
+	//		Serie2d series = chart.getSerie("series", Serie2d.Type.LINE);
+	//		int length = dataX.length;
+	//		for (int i = 0; i < length; i++){
+	//			series.add(dataX[i], dataY[i]);
+	//		}
+	//		series.setColor(Color.BLUE);
+	//		return chart;
+	//	}
+
+	/**
+	 * @param dataX - a float[] containing the x axis data
+	 * @param dataY - a float[] containing the y axis data
+	 * @return a chart where the input data sets have been plotted
+	 */
+	public static Chart2d get2dPlot(String seriesTitle, float[] dataX, float[] dataY){
 		Chart2d chart = new Chart2d();
 		if (dataX.length != dataY.length){
 			System.out.println("The data arrays do not match (different length)");
 			return chart;
 		}
-		Serie2d series = chart.getSerie("series", Serie2d.Type.LINE);
+		Serie2d series = chart.getSerie(seriesTitle, Serie2d.Type.LINE);
+		series = populateSeries(series, dataX, dataY);
+		return chart;
+	}
+
+	/**
+	 * @param series 
+	 * @param dataX
+	 * @param dataY
+	 * @return
+	 */
+	public static Serie2d populateSeries(Serie2d series, float[] dataX, float[] dataY) {
 		int length = dataX.length;
 		for (int i = 0; i < length; i++){
 			series.add(dataX[i], dataY[i]);
 		}
 		series.setColor(Color.BLUE);
-		return chart;
+		return series;
 	}
 
 	/**
@@ -301,39 +354,46 @@ public class Plotter2D {
 	 * @param dataY - a long[] containing the y axis data
 	 * @return a chart where the input data sets have been plotted
 	 */
-	public static Chart2d get2dPlot(float[] dataX, long[] dataY){
+	//	public static Chart2d get2dPlot(float[] dataX, double[] dataY){
+	//		Chart2d chart = new Chart2d();
+	//		if (dataX.length != dataY.length){
+	//			System.out.println("The data arrays do not match (different length)");
+	//			return chart;
+	//		}
+	//		Serie2d series = chart.getSerie("series", Serie2d.Type.LINE);
+	//		int length = dataX.length;
+	//		for (int i = 0; i < length; i++){
+	//			series.add(dataX[i], dataY[i]);
+	//		}
+	//		series.setColor(Color.BLUE);
+	//		return chart;
+	//	}
+
+	/**
+	 * @param dataX - a float representing the fixed x axis distance between 2 points 
+	 * @param dataY - a long[] containing the y axis data
+	 * @return a chart where the input data sets have been plotted
+	 */
+	public static Chart2d get2dPlot(String seriesTitle, float xStep, float[] dataY){
 		Chart2d chart = new Chart2d();
-		if (dataX.length != dataY.length){
-			System.out.println("The data arrays do not match (different length)");
-			return chart;
-		}
-		Serie2d series = chart.getSerie("series", Serie2d.Type.LINE);
-		int length = dataX.length;
-		for (int i = 0; i < length; i++){
-			series.add(dataX[i], dataY[i]);
-		}
-		series.setColor(Color.BLUE);
+		Serie2d series = chart.getSerie(seriesTitle, Serie2d.Type.LINE);
+		series = populateSeries(series, xStep, dataY);
 		return chart;
 	}
 
 	/**
-	 * @param dataX - a double[] containing the x axis data
-	 * @param dataY - a long[] containing the y axis data
-	 * @return a chart where the input data sets have been plotted
+	 * @param series
+	 * @param xStep
+	 * @param dataY
+	 * @return
 	 */
-	public static Chart2d get2dPlot(float[] dataX, double[] dataY){
-		Chart2d chart = new Chart2d();
-		if (dataX.length != dataY.length){
-			System.out.println("The data arrays do not match (different length)");
-			return chart;
-		}
-		Serie2d series = chart.getSerie("series", Serie2d.Type.LINE);
-		int length = dataX.length;
+	private static Serie2d populateSeries(Serie2d series, float xStep, float[] dataY) {
+		int length = dataY.length;
 		for (int i = 0; i < length; i++){
-			series.add(dataX[i], dataY[i]);
+			series.add(xStep*i, dataY[i]);
 		}
 		series.setColor(Color.BLUE);
-		return chart;
+		return series;
 	}
 
 	/**
@@ -341,61 +401,45 @@ public class Plotter2D {
 	 * @param dataY - a long[] containing the y axis data
 	 * @return a chart where the input data sets have been plotted
 	 */
-	public static Chart2d get2dPlot(double xStep, long[] dataY){
-		Chart2d chart = new Chart2d();
-		Serie2d series = chart.getSerie("series", Serie2d.Type.LINE);
-		int length = dataY.length;
-		for (int i = 0; i < length; i++){
-			series.add(xStep*i, dataY[i]);
-		}
-		series.setColor(Color.BLUE);
-		return chart;
-	}
-
-	/**
-	 * @param dataX - a float representing the fixed x axis distance between 2 points 
-	 * @param dataY - a long[] containing the y axis data
-	 * @return a chart where the input data sets have been plotted
-	 */
-	public static Chart2d get2dPlot(double xStep, double[] dataY){
-		Chart2d chart = new Chart2d();
-		Serie2d series = chart.getSerie("series", Serie2d.Type.LINE);
-		int length = dataY.length;
-		for (int i = 0; i < length; i++){
-			series.add(xStep*i, dataY[i]);
-		}
-		series.setColor(Color.BLUE);
-		return chart;
-	}
+	//	public static Chart2d get2dPlot(double xStep, double[] dataY){
+	//		Chart2d chart = new Chart2d();
+	//		Serie2d series = chart.getSerie("series", Serie2d.Type.LINE);
+	//		int length = dataY.length;
+	//		for (int i = 0; i < length; i++){
+	//			series.add(xStep*i, dataY[i]);
+	//		}
+	//		series.setColor(Color.BLUE);
+	//		return chart;
+	//	}
 
 	/**
 	 * @param axialProfilesDataX
 	 * @param axialProfilesDataY
 	 * @return
 	 */
-	public static Chart get2dPlot(double[] dataX, double[] dataY) {
-		Chart2d chart = new Chart2d();
-		Serie2d series = chart.getSerie("series", Serie2d.Type.LINE);
-		int length = dataY.length;
-		for (int i = 0; i < length; i++){
-			series.add(dataX[i], dataY[i]);
-		}
-		series.setColor(Color.BLACK);
-		return chart;
-	}
+	//	public static Chart get2dPlot(String seriesTitle, double[] dataX, double[] dataY) {
+	//		Chart2d chart = new Chart2d();
+	//		Serie2d series = chart.getSerie(seriesTitle, Serie2d.Type.LINE);
+	//		int length = dataY.length;
+	//		for (int i = 0; i < length; i++){
+	//			series.add(dataX[i], dataY[i]);
+	//		}
+	//		series.setColor(Color.BLACK);
+	//		return chart;
+	//	}
 
 	/**
 	 * @param axialProfilesDataX
 	 * @param axialProfilesDataY
 	 * @return
 	 */
-	public static Chart get2dPlot(double[] dataX, double[][] dataY) {
+	public static Chart get2dPlot(String seriesTitle, float[] dataX, float[][] dataY) {
 		Chart2d chart = new Chart2d();
 
 		Random r = new Random();
 
 		for (int it = 0; it < dataY.length; it++){
-			Serie2d series = chart.getSerie("series", Serie2d.Type.LINE);
+			Serie2d series = chart.getSerie(seriesTitle, Serie2d.Type.LINE);
 			int length = dataY[it].length;
 			for (int i = 0; i < length; i++){
 				series.add(dataX[i], dataY[it][i]);

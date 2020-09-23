@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>uk.ac.cf.milling.vm</groupId>
 	<artifactId>milling-utils</artifactId>
-	<version>0.7.0</version>
+	<version>0.8.0</version>
 	<name>Milling Utilities</name>
 	<description>Containing utility methods for the Milling Virtual Machine and Milling Digital Twin</description>
 	<build>
@@ -87,8 +87,14 @@
 		<dependency>
 			<groupId>uk.ac.cf.milling.vm</groupId>
 			<artifactId>milling-database</artifactId>
-			<version>0.7.0</version>
+			<version>0.8.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.jidesoft</groupId>
+			<artifactId>jide-oss</artifactId>
+			<version>3.6.18</version>
+		</dependency>
+
 	</dependencies>
 	<repositories>
 		<repository>
