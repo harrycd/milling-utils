@@ -309,7 +309,7 @@ public class DataManipulationUtils {
 		
 		double[] timePoints = new double[listSize];
 		String[] pocketIds = new String[listSize];
-		long[] mrr = new long[listSize];
+		double[] mrr = new double[listSize];
 		
 		int counter = 0;
 		
@@ -339,7 +339,7 @@ public class DataManipulationUtils {
 				pocketIds[counter] = entry[pocketIndex];
 			
 			if (mRRIndex > -1)
-				mrr[counter] = Long.parseLong(entry[mRRIndex]);
+				mrr[counter] = Double.parseDouble(entry[mRRIndex]);
 			
 			counter++;
 		}
