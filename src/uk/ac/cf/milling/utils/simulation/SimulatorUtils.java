@@ -57,6 +57,7 @@ public class SimulatorUtils {
 						
 						// Add MRR at the analysis file
 						System.out.println("Adding MRR to analysis file");
+		IoUtils.addColumnToCSVFile(inputFilePath, "MR", kpis.getMr());
 		IoUtils.addColumnToCSVFile(inputFilePath, "MRR", kpis.getMrr());
 						System.out.println("done");
 		
@@ -108,6 +109,7 @@ public class SimulatorUtils {
 						
 						// Add MRR at the analysis file
 						System.out.println("Adding MRR to analysis file");
+		IoUtils.addColumnToCSVFile(analysisFilePath, "MRR", kpis.getMr());
 		IoUtils.addColumnToCSVFile(analysisFilePath, "MRR", kpis.getMrr());
 						System.out.println("done");
 						

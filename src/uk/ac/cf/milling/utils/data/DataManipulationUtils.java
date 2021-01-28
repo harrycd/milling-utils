@@ -307,7 +307,7 @@ public class DataManipulationUtils {
 		double[] spindleSpeed = new double[listSize];
 		double[] spindleLoad = new double[listSize];
 		
-		float[] timePoints = new float[listSize];
+		double[] timePoints = new double[listSize];
 		String[] pocketIds = new String[listSize];
 		long[] mrr = new long[listSize];
 		
@@ -371,7 +371,7 @@ public class DataManipulationUtils {
 		double[] x = kpis.getToolX();
 		double[] y = kpis.getToolY();
 		double[] z = kpis.getToolZ();
-		float[] t = kpis.getTimePoints();
+		double[] t = kpis.getTimePoints();
 		double[] ss = kpis.getSpindleSpeed();
 		double[] xl = kpis.getxLoad();
 		double[] yl = kpis.getyLoad();
@@ -382,7 +382,7 @@ public class DataManipulationUtils {
 		
 		// Needed for calculation of truncated data
 		int truncatedRecords = 0;
-		float tTrunc = t[0];
+		double tTrunc = t[0];
 		double ssTrunc = ss[0];
 		double xlTrunc = xl[0];
 		double ylTrunc = yl[0];
@@ -473,14 +473,16 @@ public class DataManipulationUtils {
 		double[][] data = IoUtils.getCSVValues(filePath);
 
 		List<String> params = new ArrayList<String>();
+		params.add("t");
 		params.add("X");
 		params.add("Y");
 		params.add("Z");
 		List<Integer> indexes = findTitleIndex(params, titles);
 		
-		int xIndex = indexes.get(0);
-		int yIndex = indexes.get(1);
-		int zIndex = indexes.get(2);
+		int tIndex = indexes.get(0);
+		int xIndex = indexes.get(1);
+		int yIndex = indexes.get(2);
+		int zIndex = indexes.get(3);
 		
 		List<String[]> entries = new ArrayList<String[]>();
 		entries.add(titles); //add CSV titles
@@ -490,6 +492,7 @@ public class DataManipulationUtils {
 		for (int i = 1; i < data.length; i++) {
 			
 			//calculate distance
+			double tDiff = data[i][tIndex] - data[i-1][tIndex];
 			double xDist = data[i][xIndex] - data[i-1][xIndex];
 			double yDist = data[i][yIndex] - data[i-1][yIndex];
 			double zDist = data[i][zIndex] - data[i-1][zIndex];
@@ -497,6 +500,9 @@ public class DataManipulationUtils {
 			double maxDist = Math.max(xDist, Math.max(yDist, zDist));
 			if (maxDist > elemsize) {
 				int segments = (int) (1 + maxDist/elemsize);
+				
+				double tStart = data[i-1][tIndex];
+//				double tEnd = data[i][tIndex];
 				
 				double xStart = data[i-1][xIndex];
 				double xEnd = data[i][xIndex];
@@ -507,12 +513,15 @@ public class DataManipulationUtils {
 				double zStart = data[i-1][zIndex];
 				double zEnd = data[i][zIndex];
 				
+				double tIncr = tDiff / segments;
 				double xIncr = (xEnd - xStart) / segments;
 				double yIncr = (yEnd - yStart) / segments;
 				double zIncr = (zEnd - zStart) / segments;
 				
 				for (int j = 1; j < segments; j++) {
 					double[] dim = data[i];
+					
+					dim[tIndex] = tStart + j * tIncr;
 					
 					dim[xIndex] = xStart + j * xIncr;
 					dim[yIndex] = yStart + j * yIncr;

@@ -4,6 +4,7 @@
 package uk.ac.cf.milling.utils.simulation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JProgressBar;
@@ -29,8 +30,8 @@ public class MRRCalculator {
 
 		Billet billet = config.getBillet();
 		//These are the columns of the temporary file parsed separately.
-		float[] timePoints = kpis.getTimePoints();
-		double[] xSpindles = kpis.getToolX(); 
+		double[] timePoints = kpis.getTimePoints();
+		double[] xSpindles = kpis.getToolX(); 		
 		double[] ySpindles = kpis.getToolY(); 
 		double[] zSpindles = kpis.getToolZ();
 		double[] spindleSpeed = kpis.getSpindleSpeed();
@@ -74,8 +75,9 @@ public class MRRCalculator {
 		double zBilletMax = billet.getZBilletMax();
 		
 
-		// Initialise material removal rate array
-		long[] mrr = new long[analysisFileLines];
+		// Initialise material removal arrays
+		long[] mr = new long[analysisFileLines];
+		double[] mrr = new double[analysisFileLines];
 
 		//Generate the mesh and assign it to billet.part
 		billet.generateMesh();
@@ -85,7 +87,8 @@ public class MRRCalculator {
 		int xBilletElCount = part.length;
 		int yBilletElCount = part[0].length;
 		int zBilletElCount = part[0][0].length;
-
+		
+		
 		// To display progress
 		JProgressBar progressBar = SettingUtils.getProgressBar();
 		int fivePerCentLine = (int) (analysisFileLines * 0.05);
@@ -95,8 +98,8 @@ public class MRRCalculator {
 		 * Declare variables outside the loop to improve performance
 		 */
 		
-		float timePoint = 0;//Current point in time (seconds from process start)
-		float timeDiff = 0;	//The difference between current and previous time point
+		double timePoint = 0;//Current point in time (seconds from process start)
+		double timeDiff = 0;	//The difference between current and previous time point
 		double xSpindle = 0; 	//The x coordinate of the tool
 		double ySpindle = 0; 	//The y coordinate of the tool
 		double zSpindle = 0; 	//The z coordinate of the tool
@@ -178,9 +181,7 @@ public class MRRCalculator {
 			double yToolCoordMin = 0; 	// the min y coordinate of tool at the examined z coordinate
 			double yToolCoordMax = 0; 	// the max y coordinate of tool at the examined z coordinate
 			
-			double zToolElCoord = zSpindle;	// z coordinate of the element to examine if it machines the billet
-//			double zToolCoordMin = toolZ;	// the min z coordinate of tool the examined tool position
-//			double zToolCoordMax = toolZ + toolAxialProfile.get(toolAxialProfile.size()-1).getDistanceFromBase();	// the max z coordinate of tool at the examined tool position
+			double zToolElCoord = zToolNoseCoord;	// z coordinate of the element to examine if it machines the billet
 			
 			double xDistFromToolCentre = 0; 		// distance on x axis between examined tool element and tool position
 			double yDistFromToolCentre = 0; 		// distance on y axis between examined tool element and tool position
@@ -190,7 +191,7 @@ public class MRRCalculator {
 			int yPartEl = 0; // Y position of the part's element
 			int zPartEl = 0; // Z position of the part's element
 
-			for (int zToolEl = 0; zToolEl < zToolElCount; zToolEl++, zToolElCoord -= elemSize){
+			for (int zToolEl = 0; zToolEl < zToolElCount; zToolEl++, zToolElCoord += elemSize){
 				//radius of the tool at this specific z coordinate
 				toolLocalRadius = cuttingToolAxialProfile.get(zToolEl).getDistanceFromCentre();
 				
@@ -210,8 +211,8 @@ public class MRRCalculator {
 					while (yToolElCoord <= yToolCoordMax){
 						xDistFromToolCentre = xToolElCoord - xSpindle;
 						yDistFromToolCentre = yToolElCoord - ySpindle;
-						radialDistFromToolCentre = xDistFromToolCentre * xDistFromToolCentre + yDistFromToolCentre * yDistFromToolCentre; //SQRT is not needed because x > y => sqrt(x) > sqrt(y) when x,y > 0
-						if ((radialDistFromToolCentre) <= toolLocalRadius * toolLocalRadius){ //Check if within tool radius
+						radialDistFromToolCentre = Math.sqrt(xDistFromToolCentre * xDistFromToolCentre + yDistFromToolCentre * yDistFromToolCentre);
+						if ((radialDistFromToolCentre) <= toolLocalRadius){ //Check if within tool radius
 							xPartEl = (int) ((xToolElCoord - xBilletMin)/elemSize);
 							yPartEl = (int) ((yToolElCoord - yBilletMin)/elemSize);
 							zPartEl = (int) ((zToolElCoord - zBilletMin)/elemSize);
@@ -228,12 +229,12 @@ public class MRRCalculator {
 								part[xPartEl][yPartEl][zPartEl] = true;
 								
 								//Add the machined element to the material removal array
-								mrr[line] += 1;
+								mr[line] += 1;
 								
 								//Add the machined element to the tool usage
 								radialToolEl = (int)(Math.sqrt(radialDistFromToolCentre)/elemSize);
-								cuttingToolAxialProfile.get(zToolEl).appendMaterialRemoved(elemSize * axialRatio);
-								cuttingToolRadialProfile.get(radialToolEl).appendMaterialRemoved(elemSize * radialRatio);
+								cuttingToolAxialProfile.get(zToolEl).addMaterialRemoved(axialRatio);
+								cuttingToolRadialProfile.get(radialToolEl).addMaterialRemoved(radialRatio);
 								
 								//Record the insertions per tooth on the respective axis of movement
 								insertions = (int) (spindleSpeed[line] * teeth_x_TimeStep_div_by_60);
@@ -256,14 +257,36 @@ public class MRRCalculator {
 					yToolElCoord = yToolCoordMin; //reset
 				}
 			}
-			timePoints[line] = timePoint;
+			mrr[line] = mr[line] / timeDiff;
 		}
-//		tools = normaliseToolMRR(tools, timePoints);
-		
+		System.out.println("Total elements: " + xBilletElCount + " x " + yBilletElCount + " x " + zBilletElCount);
+		System.out.println("Machined elements (mr):" + Arrays.stream(mr).sum());
+		countMachinedElements(part);
+		kpis.setMr(mr);
 		kpis.setMrr(mrr);
 		kpis.setPart(part);
-		kpis.setTimePoints(timePoints);
 		kpis.setTools(usedCuttingTools);
 		return kpis;
+	}
+
+
+	/**
+	 * @param part
+	 */
+	private static void countMachinedElements(boolean[][][] part) {
+		long trues = 0;
+		long falses = 0;
+		for (int i = 0; i < part.length; i++) {
+			for (int j = 0; j < part[i].length; j++) {
+				for (int k = 0; k < part[i][j].length; k++) {
+					if (part[i][j][k]) {
+						trues++;
+					} else {
+						falses++;
+					}
+				}
+			}
+		}
+		System.out.println("Elements machined: " + trues + " Non machined: " + falses);
 	}
 }

@@ -27,7 +27,7 @@ public class DuplicatePositionMerger {
 		double[] x = kpis.getToolX();
 		double[] y = kpis.getToolY();
 		double[] z = kpis.getToolZ();
-		float[] t = kpis.getTimePoints();
+		double[] t = kpis.getTimePoints();
 		double[] ss = kpis.getSpindleSpeed();
 		double[] xl = kpis.getxLoad();
 		double[] yl = kpis.getyLoad();
@@ -38,7 +38,7 @@ public class DuplicatePositionMerger {
 		
 		// Needed for calculation of truncated data
 		int truncatedRecords = 0;
-		float tTrunc = t[0];
+		double tTrunc = t[0];
 		double ssTrunc = ss[0];
 		double xlTrunc = xl[0];
 		double ylTrunc = yl[0];

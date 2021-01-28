@@ -21,6 +21,7 @@ import org.jzy3d.colors.Color;
 import org.jzy3d.maths.BoundingBox3d;
 import org.jzy3d.maths.Coord2d;
 import org.jzy3d.plot2d.primitives.Serie2d;
+import org.jzy3d.plot2d.primitives.Serie2d.Type;
 import org.jzy3d.plot3d.primitives.axes.layout.providers.SmartTickProvider;
 import org.jzy3d.plot3d.rendering.view.modes.ViewBoundMode;
 
@@ -61,17 +62,13 @@ public class Plotter2D {
 	}
 
 	/**
-	 * @param dataX
-	 * @param dataY
+	 * @param seriesTitle
+	 * @param seriesData
 	 * @return
 	 */
-//	public static JPanel get2dPlotPanel(String seriesTitle, float[] dataX, float[] dataY) {
-//		Chart chart = get2dPlot(seriesTitle, dataX, dataY);
-//		chart.getAxeLayout().setYAxeLabel(seriesTitle);
-//		//		chart.stopAnimator();
-//		JPanel chartPanel = getChartPanel(chart); 
-//		return chartPanel;
-//	}
+	public static JPanel get2dPlotPanel(String seriesTitle, float[] seriesData) {
+		return get2dPlotPanel(seriesTitle, seriesData, false);
+	}
 
 	/**
 	 * @param seriesTitle
@@ -80,28 +77,42 @@ public class Plotter2D {
 	 * @return
 	 */
 	public static JPanel get2dPlotPanel(String seriesTitle, float[] dataX, float[] dataY) {
-		Chart chart = get2dPlot(seriesTitle, dataX, dataY);
-		chart.getAxeLayout().setYAxeLabel(seriesTitle);
-		//		chart.stopAnimator();
-		JPanel chartPanel = getChartPanel(chart); 
-		PlotterUtils.registerChart(chartPanel, chart);
-		return chartPanel;
+		return get2dPlotPanel(seriesTitle, dataX, dataY, false);
 	}
 
 	/**
-	 * @param seriesData
+	 * @param seriesTitle
+	 * @param dataY
+	 * @param scatter
 	 * @return
 	 */
-	public static JPanel get2dPlotPanel(String seriesTitle, float[] seriesData) {
-		Chart2d chart = get2dPlot(seriesTitle, seriesData);
+	public static JPanel get2dPlotPanel(String seriesTitle, float[] dataY, boolean scatter) {
+		float[] dataX = new float[dataY.length];
+		for (int i = 0; i < dataY.length; i++) {
+			dataX[i] = i;
+		}
+		return get2dPlotPanel(seriesTitle, dataX, dataY, scatter);
+	}
+	
+	/**
+	 * @param seriesTitle
+	 * @param dataX
+	 * @param dataY
+	 * @return
+	 */
+	public static JPanel get2dPlotPanel(String seriesTitle, float[] dataX, float[] dataY, boolean scatter) {
+		Type type = (scatter ? Serie2d.Type.SCATTER_POINTS : Serie2d.Type.LINE);
+		Chart2d chart = get2dPlot(seriesTitle,dataX, dataY, type);
 		chart.getAxeLayout().setYAxeLabel(seriesTitle);
 		//		chart.stopAnimator();
 		JPanel chartPanel = getChartPanel(chart); 
 		PlotterUtils.registerChart(chartPanel, chart);
 		chartPanel.putClientProperty("series", chart.getSerie(seriesTitle, null));
-		chartPanel.putClientProperty("data", seriesData);
+		chartPanel.putClientProperty("dataX", dataX);
+		chartPanel.putClientProperty("dataY", dataY);
 		return chartPanel;
 	}
+	
 
 	/**
 	 * Add a plot with a single curve showing which is values0 - values1
@@ -261,9 +272,10 @@ public class Plotter2D {
 	 * @param seriesData - a long[] array containing the data to plot
 	 * @return a chart containing a plot of provided points with x axis distance = 1
 	 */
-	public static Chart2d get2dPlot(String seriesTitle, float[] seriesData){
+	public static Chart2d get2dPlot(String seriesTitle, float[] seriesData, Type type){
 		Chart2d chart = new Chart2d();
-		Serie2d series = chart.getSerie(seriesTitle, Serie2d.Type.LINE);
+		Serie2d series = chart.getSerie(seriesTitle, type);
+		series.setColor(new Color(0, 0, 0));
 		series = populateSeries(series, seriesData);
 		return chart;
 	}
@@ -323,13 +335,14 @@ public class Plotter2D {
 	 * @param dataY - a float[] containing the y axis data
 	 * @return a chart where the input data sets have been plotted
 	 */
-	public static Chart2d get2dPlot(String seriesTitle, float[] dataX, float[] dataY){
+	public static Chart2d get2dPlot(String seriesTitle, float[] dataX, float[] dataY, Type type){
 		Chart2d chart = new Chart2d();
 		if (dataX.length != dataY.length){
 			System.out.println("The data arrays do not match (different length)");
 			return chart;
 		}
-		Serie2d series = chart.getSerie(seriesTitle, Serie2d.Type.LINE);
+		Serie2d series = chart.getSerie(seriesTitle, type);
+		series.setColor(new Color(0, 0, 0));
 		series = populateSeries(series, dataX, dataY);
 		return chart;
 	}
@@ -345,7 +358,7 @@ public class Plotter2D {
 		for (int i = 0; i < length; i++){
 			series.add(dataX[i], dataY[i]);
 		}
-		series.setColor(Color.BLUE);
+		series.setColor(Color.BLACK);
 		return series;
 	}
 
@@ -374,9 +387,10 @@ public class Plotter2D {
 	 * @param dataY - a long[] containing the y axis data
 	 * @return a chart where the input data sets have been plotted
 	 */
-	public static Chart2d get2dPlot(String seriesTitle, float xStep, float[] dataY){
+	public static Chart2d get2dPlot(String seriesTitle, float xStep, float[] dataY, Type type){
 		Chart2d chart = new Chart2d();
-		Serie2d series = chart.getSerie(seriesTitle, Serie2d.Type.LINE);
+		Serie2d series = chart.getSerie(seriesTitle, type);
+		series.setColor(new Color(0, 0, 0));
 		series = populateSeries(series, xStep, dataY);
 		return chart;
 	}

@@ -23,6 +23,7 @@ public class KPIUtils {
 		if (newKPIs.getTime() != 0) oldKPIs.setTime(newKPIs.getTime());
 		if (!newKPIs.getTimeUnits().equals("")) oldKPIs.setTimeUnits(newKPIs.getTimeUnits());
 		if (!newKPIs.getAnalysisData().equals("")) oldKPIs.setAnalysisData(newKPIs.getAnalysisData());
+		if (newKPIs.getMr() != null) oldKPIs.setMr(newKPIs.getMr());
 		if (newKPIs.getMrr() != null) oldKPIs.setMrr(newKPIs.getMrr());
 		if (newKPIs.getTimePoints() != null) oldKPIs.setTimePoints(newKPIs.getTimePoints());
 
@@ -43,37 +44,37 @@ public class KPIUtils {
 	/**
 	 * @return the material removal rate in mm3 per sec
 	 */
-	public static double[] getMrrMM3perSec(KPIs kpis, SimulatorConfig config){
-		/**
-		 * @param mrr - the number of elements machined during the period between previous and current timepoint
-		 * @param timePoints - the array of timepoints that the tool state (position and parameters) is observed
-		 * @return the average removal rate in elements per time unit
-		 */
-		
-		long[] mrr = kpis.getMrr();
-		int length = mrr.length;
-		double[] mrrMM3 = new double[length];
-		
-		double elementSize = SettingUtils.getElementSize();
-		
-		float[] timePoints = kpis.getTimePoints();
-		float timePoint = 0; // current point in time (time from process start)
-		float timeDiff = 0; // difference between current and previous point
-		int index = 0;	//index used to avoid duplicate timepoints
-		
-		// Calculate the volume per second removed
-		for (int i = 0; i < length; i++){
-			timeDiff = timePoints[i] - timePoint;
-			if (timeDiff > 0) {
-				timePoint = timePoints[index];
-				if (mrr[index] > 0) { //do calculation only when necessary
-					mrrMM3[index] = elementSize * elementSize * elementSize * mrr[index] / timeDiff;
-				}
-				index++;
-			}
-		}
-		return mrrMM3;
-	}
+//	public static double[] getMrrMM3perSec(KPIs kpis, SimulatorConfig config){
+//		/**
+//		 * @param mrr - the number of elements machined during the period between previous and current timepoint
+//		 * @param timePoints - the array of timepoints that the tool state (position and parameters) is observed
+//		 * @return the average removal rate in elements per time unit
+//		 */
+//		
+//		long[] mrr = kpis.getMrr();
+//		int length = mrr.length;
+//		double[] mrrMM3 = new double[length];
+//		
+//		double elementSize = SettingUtils.getElementSize();
+//		
+//		float[] timePoints = kpis.getTimePoints();
+//		float timePoint = 0; // current point in time (time from process start)
+//		float timeDiff = 0; // difference between current and previous point
+//		int index = 0;	//index used to avoid duplicate timepoints
+//		
+//		// Calculate the volume per second removed
+//		for (int i = 0; i < length; i++){
+//			timeDiff = timePoints[i] - timePoint;
+//			if (timeDiff > 0) {
+//				timePoint = timePoints[index];
+//				if (mrr[index] > 0) { //do calculation only when necessary
+//					mrrMM3[index] = elementSize * elementSize * elementSize * mrr[index] / timeDiff;
+//				}
+//				index++;
+//			}
+//		}
+//		return mrrMM3;
+//	}
 	
 	/**
 	 * @param kpis - the kpis to produce an analysis file from
@@ -97,7 +98,7 @@ public class KPIUtils {
 
 		boolean carouselFlag = false;
 		
-
+		boolean mrFlag = false;
 		boolean mrrFlag = false;
 		
 		// Set flag for data available on kpis
@@ -111,6 +112,7 @@ public class KPIUtils {
 		if (kpis.getzLoad() != null) zLoadFlag = true;
 		if (kpis.getSpindleLoad() != null) spindleLoadFlag = true;
 		if (kpis.getCarouselPocketId() != null) carouselFlag = true;
+		if (kpis.getMr() != null) mrFlag=true;
 		if (kpis.getMrr() != null) mrrFlag=true;
 		
 		//Write the title line based on the flag information
@@ -124,6 +126,7 @@ public class KPIUtils {
 		sb.append(zLoadFlag ? "ZL," : "");
 		sb.append(spindleLoadFlag ? "SL," : "");
 		sb.append(carouselFlag ? "T," : "");
+		sb.append(mrFlag ? "MR," : "");
 		sb.append(mrrFlag ? "MRR," : "");
 		sb.replace(sb.length()-1, sb.length(), "\n");
 		
@@ -140,6 +143,7 @@ public class KPIUtils {
 			if (zLoadFlag) sb.append(kpis.getzLoad()[index] + ",");
 			if (spindleLoadFlag) sb.append(kpis.getSpindleLoad()[index] + ",");
 			if (carouselFlag) sb.append(kpis.getCarouselPocketId()[index] + ",");
+			if (mrFlag) sb.append(kpis.getMr()[index] + ",");
 			if (mrrFlag) sb.append(kpis.getMrr()[index] + ",");
 			sb.replace(sb.length()-1, sb.length(), "\n");
 		}

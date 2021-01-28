@@ -41,8 +41,8 @@ public class MonitoringUtils {
 		System.out.println("Monit file:" + nc.getMonitoringPath());
 		KPIs kpiTh = DataManipulationUtils.parseDataFile(nc.getAnalysisPath());
 		KPIs kpiMon = DataManipulationUtils.parseDataFile(nc.getMonitoringPath());
-		float[] timeMon = kpiMon.getTimePoints();
-		float[] timeTh = kpiTh.getTimePoints();
+		double[] timeMon = kpiMon.getTimePoints();
+		double[] timeTh = kpiTh.getTimePoints();
 		double[] xCoord = kpiMon.getToolX();
 		double[] yCoord = kpiMon.getToolY();
 		double[] zCoord = kpiMon.getToolZ();
@@ -54,12 +54,12 @@ public class MonitoringUtils {
 		while(it < kpiThLength){
 			JSONObject json = new JSONObject();
 			if (!pocketId.equals(pocketIds[it])){
-				CuttingTool tool = CarouselUtils.getCarouselPocketTool(Integer.parseInt(pocketIds[it]));
+				CuttingTool tool = CarouselUtils.getCarouselPocketTool(Double.valueOf(pocketIds[it]).intValue());
 				//TODO this works only for tools with constant radius
 				pocketId = pocketIds[it];
 				json.put("toolRadius", tool.getAxialProfile().get(0).getDistanceFromCentre());
 				json.put("toolHeight", tool.getToolLength());
-				System.out.println("Tool changed. New diameter:" + tool.getAxialProfile().get(0).getDistanceFromCentre());
+				System.out.println("Tool changed. Diameter:" + tool.getAxialProfile().get(0).getDistanceFromCentre() + " Height:" + tool.getToolLength());
 			}
 			json.put("xCoord", xCoord[it]);
 			json.put("yCoord", yCoord[it]);
@@ -100,7 +100,7 @@ public class MonitoringUtils {
 	 * @param timeTh
 	 * @return a string containing the parameters formated in JSON so it can be submitted to the client
 	 */
-	private static String formatResponse(double xCoord, double yCoord, double zCoord, float timeMon, float timeTh){
+	private static String formatResponse(double xCoord, double yCoord, double zCoord, double timeMon, double timeTh){
 		
 		String state = "data:{"
 				+ "\"xCoord\":" + xCoord + ", "
