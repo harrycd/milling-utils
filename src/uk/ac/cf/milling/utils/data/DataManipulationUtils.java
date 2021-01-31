@@ -563,21 +563,24 @@ public class DataManipulationUtils {
 		List<Integer> indexes = new ArrayList<Integer>();
 
 		for (String param : params) {
-			boolean paramFound = false;
-			for (int index = 0; index < titles.length; index++) {
-				if (param.equals(titles[index])){
-					indexes.add(index);
-					paramFound = true;
-					break;
-				}
-			}
-			if (!paramFound) {
-				indexes.add(-1); //If not found something has to be add to indicate not found
-				System.out.println("Not all parameters were found in title list");
-			}
+			indexes.add(findTitleIndex(param, titles));
 		}
 
 		return indexes;
+	}
+	
+	/**
+	 * @param param - parameter title to look for
+	 * @param titles - array containing String titles
+	 * @return the index of specified parameter. Returns -1 if parameter title not found.
+	 */
+	public static int findTitleIndex(String param, String[] titles) {
+		for (int index = 0; index < titles.length; index++) {
+			if (param.equals(titles[index])){
+				return index;
+			}
+		}
+		return -1;
 	}
 	
 	/**
