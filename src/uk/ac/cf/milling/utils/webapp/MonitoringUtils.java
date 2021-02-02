@@ -55,13 +55,30 @@ public class MonitoringUtils {
 		boolean isConnected = true;
 
 		while(it < dataLength && isConnected){ // Every iteration is 1 sample from the machine
-			JSONObject sample = new JSONObject();
+			JSONObject machineSample = new JSONObject();
+			JSONObject simulationSample = new JSONObject();
+			JSONObject machineTool = new JSONObject();
+			JSONObject simulationTool = new JSONObject();
+			JSONObject sseSample = new JSONObject();
+			
 
 			// Update sample if cutting tool has changed
-			pocketId = updateCuttingToolData(sample, pocketId, dataMon[it][toolIndex]);
+			pocketId = updateCuttingToolData(machineTool, pocketId, dataMon[it][toolIndex]);
+			
+			// Add to sample all other sample data
+			addToJson(machineSample, titlesMon, dataMon[it]);
+			
+			// TODO this is done for testing only. Simulation sample should have simulator data!!!
+			simulationSample = machineSample;
+			simulationTool = machineTool;
+			
+			sseSample.put("machine", machineSample);
+			sseSample.put("machineTool", machineTool);
+			sseSample.put("simulator", simulationSample);
+			sseSample.put("simulatorTool", simulationTool);
 			
 			// Generate the string to send to the client
-			String sampleData = "data:" + addToJson(sample, titlesMon, dataMon[it]) + "\n\n";
+			String sampleData = "data:" + sseSample.toJSONString() + "\n\n";
 			
 			// Send the sample data to the client
 			isConnected = sendToClient(response, pw, sampleData);
@@ -70,7 +87,6 @@ public class MonitoringUtils {
 			synchroniseWithMonitoringTime(dataMon[it][timeIndex] * 1000, executionTimeStart);
 			it++;
 		}
-		response.setContentType("text/html");
 		if (pw != null) {
 			pw.close();
 		}
