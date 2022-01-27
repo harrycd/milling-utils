@@ -7,7 +7,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import uk.ac.cf.milling.utils.simulation.MLUtils;
+import uk.ac.cf.milling.utils.learning.DataSynchronisation;
 
 /**
  * @author Theocharis Alexopoulos
@@ -39,7 +39,7 @@ public class DataCompare {
 		curve1[1] = y1;
 		curve1[2] = z1;
 
-		int[][] relation = MLUtils.getCurveRelation(curve0, curve1);
+		int[][] relation = DataSynchronisation.getCurveRelation(curve0, curve1);
 		
 		System.out.println("DTW took: " + (System.currentTimeMillis() - stepTime) + "msec");
 		stepTime = System.currentTimeMillis();

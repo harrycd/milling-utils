@@ -366,7 +366,13 @@ public class DataManipulationUtils {
 	 * Removes data entries that have the same tool coordinates.
 	 * It recalculates all other data parameters
 	 */
-	public static void cleanDuplicateCoordinates(String filePath) {
+	/**
+	 * 
+	 * 
+	 * @param filePath
+	 * @return
+	 */
+	public static String getCleanFromDuplicateCoordinatesData(String filePath) {
 		KPIs kpis = DataManipulationUtils.parseDataFile(filePath);
 		double[] x = kpis.getToolX();
 		double[] y = kpis.getToolY();
@@ -449,7 +455,7 @@ public class DataManipulationUtils {
 				c[dataSize-1] + "\n"
 		);
 		
-		IoUtils.writeFile(filePath + "_clean.csv", sb.toString());
+		return sb.toString();
 	}
 	
 	

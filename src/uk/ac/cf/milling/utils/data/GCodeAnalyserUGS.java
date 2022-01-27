@@ -58,10 +58,11 @@ public class GCodeAnalyserUGS {
 	private GcodeState state;
 
 	/**
-	 * @param args
+	 * Translates a G-Code file to the format used in CSV data files
+	 * @param gcodeFilePath - filepath of the file containing the G-Code
+	 * @return a List<string> containing the lines of the generated CSV file
 	 */
-	public void parseGCode(String gcodeFilePath) {
-//		String gcodeFilePath = "C:\\Users\\Alexo\\OneDrive\\PhD\\Eclipse 2018-09\\MillingVM\\Con-Rod-CR.eia";
+	public List<String[]> parseGCode(String gcodeFilePath) {
 		File gcodeFile = new File(gcodeFilePath);
 		state = new GcodeState();
 		
@@ -163,8 +164,8 @@ public class GCodeAnalyserUGS {
 			
 			
 		}
-
-		IoUtils.writeCSVFile(gcodeFile.getAbsolutePath() + "_data.csv", entries);
+		
+		return entries;
 
 	}
 	

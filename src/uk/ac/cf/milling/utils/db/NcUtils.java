@@ -76,6 +76,15 @@ public class NcUtils {
 	public static void updateNc(int ncId, String ncPath, String analysisPath, String monitoringPath, int billetId){
 		new NcDB().updateNc(ncId, ncPath, analysisPath, monitoringPath, billetId);
 	}
+	
+	/**
+	 * @param ncId - id of numerical control file
+	 * @param ncPath - file path of the numerical control file
+	 * @param billetId - Id of the billet used to produce analysis file
+	 */
+	public static void updateNcPath(int ncId, String ncPath, int billetId) {
+		new NcDB().updateNcPath(ncId, ncPath, billetId);
+	}
 
 	/**
 	 * @param ncId - id of numerical control file
