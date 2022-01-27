@@ -39,9 +39,6 @@ public class MonitoringUtils {
 		System.out.println("Theor file:" + nc.getAnalysisPath());
 		System.out.println("Monit file:" + nc.getMonitoringPath());
 
-//		String[] titlesSim = IoUtils.getCSVTitles(nc.getAnalysisPath());
-//		double[][] dataSim = IoUtils.getCSVValues(nc.getAnalysisPath());
-
 		String[] titlesMon = IoUtils.getCSVTitles(nc.getMonitoringPath());
 		double[][] dataMon = IoUtils.getCSVValues(nc.getMonitoringPath());
 
@@ -56,9 +53,9 @@ public class MonitoringUtils {
 
 		while(it < dataLength && isConnected){ // Every iteration is 1 sample from the machine
 			JSONObject machineSample = new JSONObject();
-			JSONObject simulationSample = new JSONObject();
+			JSONObject simulatorSample = new JSONObject();
 			JSONObject machineTool = new JSONObject();
-			JSONObject simulationTool = new JSONObject();
+			JSONObject simulatorTool = new JSONObject();
 			JSONObject sseSample = new JSONObject();
 			
 
@@ -68,14 +65,13 @@ public class MonitoringUtils {
 			// Add to sample all other sample data
 			addToJson(machineSample, titlesMon, dataMon[it]);
 			
-			// TODO this is done for testing only. Simulation sample should have simulator data!!!
-			simulationSample = machineSample;
-			simulationTool = machineTool;
+			simulatorSample = calculateSimulatorSample(machineSample, it);
+			simulatorTool = machineTool;
 			
 			sseSample.put("machine", machineSample);
 			sseSample.put("machineTool", machineTool);
-			sseSample.put("simulator", simulationSample);
-			sseSample.put("simulatorTool", simulationTool);
+			sseSample.put("simulator", simulatorSample);
+			sseSample.put("simulatorTool", simulatorTool);
 			
 			// Generate the string to send to the client
 			String sampleData = "data:" + sseSample.toJSONString() + "\n\n";
@@ -87,9 +83,27 @@ public class MonitoringUtils {
 			synchroniseWithMonitoringTime(dataMon[it][timeIndex] * 1000, executionTimeStart);
 			it++;
 		}
-		if (pw != null) {
-			pw.close();
-		}
+	}
+
+
+	/**
+	 * @param machineSample
+	 * @return
+	 */
+	private static JSONObject calculateSimulatorSample(JSONObject machineSample, int it) {
+		JSONObject simulatorSample = new JSONObject(machineSample);
+		
+		//TODO
+		// For testing/demo purposes machineSample is being manipulated 
+		simulatorSample.put("SL", Double.parseDouble(simulatorSample.get("SL").toString())*(1 -(0.2*Math.random())));
+		simulatorSample.put("XL", Double.parseDouble(simulatorSample.get("XL").toString())*(1 -(0.2*Math.random())));
+		simulatorSample.put("YL", Double.parseDouble(simulatorSample.get("YL").toString())*(1 -(0.2*Math.random())));
+		simulatorSample.put("ZL", Double.parseDouble(simulatorSample.get("ZL").toString())*(1 -(0.2*Math.random())));
+		simulatorSample.put("X", Double.parseDouble(simulatorSample.get("X").toString())*(1 + 0.002*Math.random()));
+		simulatorSample.put("Y", Double.parseDouble(simulatorSample.get("Y").toString())*(1 + 0.002*Math.random()));
+		simulatorSample.put("Z", Double.parseDouble(simulatorSample.get("Z").toString())*(1 + 0.002*Math.random()));
+		
+		return simulatorSample;
 	}
 
 
@@ -143,7 +157,7 @@ public class MonitoringUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	private static double updateCuttingToolData(JSONObject sample, double pocketId, double newPocketId ) {
-		if ( !(pocketId == newPocketId) ){
+		if ( !(pocketId == newPocketId) && Double.valueOf(newPocketId) > 0){
 			CuttingTool tool = CarouselUtils.getCarouselPocketTool(Double.valueOf(newPocketId).intValue());
 
 			//TODO this works only for tools with constant radius
