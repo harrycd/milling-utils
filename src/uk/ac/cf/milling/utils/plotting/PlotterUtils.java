@@ -14,6 +14,7 @@ import org.jzy3d.chart.Chart;
 import uk.ac.cf.milling.objects.SettingsSingleton;
 
 /**
+ * Methods for registering and de-registering charts in the results panel.
  * @author Theocharis Alexopoulos
  *
  */

@@ -29,6 +29,7 @@ import uk.ac.cf.milling.utils.db.CarouselUtils;
 import uk.ac.cf.milling.utils.db.LearningSetUtils;
 
 /**
+ * Core methods to syncronise data with DTW
  * @author Theocharis Alexopoulos
  *
  */
@@ -116,10 +117,16 @@ public class DataSynchronisation {
 			ts2.addLast(valueIndex, point); //valueIndex is used as time. The method to work simply needs a value that increases to ensure that measurements are sorted.
 		}
 		
+		final TimeWarpInfo info = FastDTW.getWarpInfoBetween(ts1, ts2, 50, DistanceFunctionFactory.EUCLIDEAN_DIST_FN);
+		List<Integer> relationList1 = info.getPath().getTsIindexes();
+		List<Integer> relationList2 = info.getPath().getTsJindexes();
+		System.out.println("Distance between curves: " + info.getDistance());
+
+		/* The code below uses only the path without extra information.
 		final WarpPath path = FastDTW.getWarpPathBetween(ts1, ts2, 50, DistanceFunctionFactory.EUCLIDEAN_DIST_FN);
-//		final WarpPath path = DTW.getWarpPathBetween(ts1, ts2, DistanceFunctionFactory.EUCLIDEAN_DIST_FN);
 		List<Integer> relationList1 = path.getTsIindexes();
 		List<Integer> relationList2 = path.getTsJindexes();
+		*/
 		
 		int[][] relation = new int[2][];
 		relation[0] = relationList1.stream().mapToInt(i -> i).toArray();

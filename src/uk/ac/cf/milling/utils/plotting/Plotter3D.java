@@ -3,25 +3,17 @@
  */
 package uk.ac.cf.milling.utils.plotting;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
-
-import org.jzy3d.chart.Chart;
-
-import uk.ac.cf.milling.objects.Billet;
 
 /**
+ * Top level management methods for plotting 3D charts. 
  * @author Theocharis Alexopoulos
  * @date 30 Aug 2020
  *
  */
 public class Plotter3D {
-	public static JPanel getV1ChartPanel(boolean[][][] part2plot, Billet billet2plot) {
-		return Plotter3D_V1.getChartPanel(part2plot, billet2plot);
+	public static JPanel getV1ChartPanel(boolean[][][] part2plot) {
+		return Plotter3D_V1.getChartPanel(part2plot);
 	}
 	
 	public static JPanel getV2ChartPanel(boolean[][][] part) {

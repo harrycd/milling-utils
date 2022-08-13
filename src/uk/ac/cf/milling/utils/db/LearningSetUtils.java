@@ -10,8 +10,8 @@ import uk.ac.cf.milling.db.LearningSetDB;
 import uk.ac.cf.milling.objects.LearningSet;
 
 /**
+ * Methods accessing persistence layer for ML model creation and management.
  * @author Theocharis Alexopoulos
- * @date 27 Aug 2020
  *
  */
 public class LearningSetUtils {

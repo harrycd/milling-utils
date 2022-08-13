@@ -20,6 +20,12 @@ import org.jzy3d.plot3d.rendering.canvas.Quality;
 
 import uk.ac.cf.milling.utils.db.SettingUtils;
 
+/**
+ * 3D plotter version 2.<br>
+ * Produces a plot showing the surfaces of the part.
+ * @author Theocharis Alexopoulos
+ *
+ */
 public class Plotter3D_V2 {
 	
 	public static JPanel getChartPanel(boolean[][][] part) {

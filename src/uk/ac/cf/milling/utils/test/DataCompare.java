@@ -10,6 +10,8 @@ import java.io.IOException;
 import uk.ac.cf.milling.utils.learning.DataSynchronisation;
 
 /**
+ * Methods to debug data synchronisation issues.<br>
+ * The relation between each point connection is printed to a file.
  * @author Theocharis Alexopoulos
  *
  */

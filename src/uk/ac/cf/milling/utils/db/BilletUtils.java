@@ -10,6 +10,7 @@ import uk.ac.cf.milling.db.BilletDB;
 import uk.ac.cf.milling.objects.Billet;
 
 /**
+ * Methods accessing persistence layer for Billet creation and management.
  * @author Theocharis Alexopoulos
  *
  */

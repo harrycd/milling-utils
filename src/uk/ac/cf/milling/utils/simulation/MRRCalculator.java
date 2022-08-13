@@ -14,10 +14,12 @@ import uk.ac.cf.milling.objects.CuttingTool;
 import uk.ac.cf.milling.objects.CuttingToolProfile;
 import uk.ac.cf.milling.objects.KPIs;
 import uk.ac.cf.milling.objects.SimulatorConfig;
+import uk.ac.cf.milling.utils.data.IoUtils;
 import uk.ac.cf.milling.utils.db.CarouselUtils;
 import uk.ac.cf.milling.utils.db.SettingUtils;
 
 /**
+ * The implementation and support methods for the simulation engine.
  * @author Theocharis Alexopoulos
  *
  */
@@ -40,6 +42,7 @@ public class MRRCalculator {
 		
 		
 		int analysisFileLines = timePoints.length;
+//		long[] executionTime = new long[analysisFileLines]; long startTime = System.currentTimeMillis();
 
 		// Accuracy of calculation
 		double elemSize = SettingUtils.getElementSize(); //mm
@@ -68,9 +71,9 @@ public class MRRCalculator {
 		
 		// Billet parameters
 		double xBilletMin = billet.getXBilletMin();
-//		double xBilletMax = billet.getXBilletMax();
+		double xBilletMax = billet.getXBilletMax();
 		double yBilletMin = billet.getYBilletMin();
-//		double yBilletMax = billet.getYBilletMax();
+		double yBilletMax = billet.getYBilletMax();
 		double zBilletMin = billet.getZBilletMin();
 		double zBilletMax = billet.getZBilletMax();
 		
@@ -113,11 +116,13 @@ public class MRRCalculator {
 		int radialToolEl = 0; 	// The index of the radial element
 		int insertions = 0; 	//The number of insertions per tooth
 		
-		boolean errorReported = false;
+		List<String> rejectedCarouselIds = new ArrayList<String>();
+		rejectedCarouselIds.add("");
 		
 		
 		// Iterate through every block and calculate the MRR and the billet machined elements
 		for (int line = 0; line < analysisFileLines; line++){
+//			executionTime[line] = System.currentTimeMillis()-startTime;
 			// Progress calculation
 			if (line%fivePerCentLine == 0) {
 				progressBar.setValue(100*line/analysisFileLines);
@@ -141,20 +146,20 @@ public class MRRCalculator {
 			// Load the new cutting tool and profile if pocketId has changed
 			if (!carouselPocketId.equals(carouselPocketIds[line])){
 				
-				//This checks if cutting tool field is empty
 				cuttingTool = null;
-				if(!carouselPocketIds[line].equals(""))
+
+				if (rejectedCarouselIds.contains(carouselPocketIds[line])) {
+					continue;
+				} else {
 					cuttingTool = CarouselUtils.getCarouselPocketTool((int) Double.parseDouble(carouselPocketIds[line]));
-				
+				}
+
 				if (cuttingTool == null){
-					if (!errorReported) {
-						System.err.println("Simulation error: Carousel pocket " + carouselPocketIds[line] + " is empty or does not exist!");
-						errorReported = true;
-					}
-					
+					System.err.println("Simulation error: Carousel pocket " + carouselPocketIds[line] + " is empty or does not exist!");
+					rejectedCarouselIds.add(carouselPocketIds[line]);
 					continue;
 				}
-				errorReported = false;
+
 				carouselPocketId = carouselPocketIds[line];
 				cuttingToolAxialProfile = cuttingTool.getAxialProfile();
 				cuttingToolRadialProfile = cuttingTool.getRadialProfile();
@@ -173,13 +178,25 @@ public class MRRCalculator {
 			// Iterate over every z coordinate of tool
 			// Declaring variables outside the loop to improve performance
 			int zToolElCount = cuttingToolAxialProfile.size(); // the number of elements comprising tool z axis
+			
+			// Initialisations and checks if tool within billet's x axis range
 			double xToolElCoord = 0; 		// the x coordinate of the element to examine if it machines the billet
-			double xToolCoordMin = 0; 	// the min x coordinate of tool at the examined z coordinate
-			double xToolCoordMax = 0; 	// the max x coordinate of tool at the examined z coordinate 
-
+			
+			double xToolCoordMin = xSpindle - toolLocalRadius; 	// the min x coordinate of tool at the examined z coordinate
+			if (xToolCoordMin < xBilletMin) continue;
+			
+			double xToolCoordMax = xSpindle + toolLocalRadius; 	// the max x coordinate of tool at the examined z coordinate 
+			if (xToolCoordMax > xBilletMax) continue;
+			
+			
+			// Initialisations and checks if tool within billet's x axis range
 			double yToolElCoord = 0; 		// the y coordinate of the element to examine if it machines the billet
-			double yToolCoordMin = 0; 	// the min y coordinate of tool at the examined z coordinate
-			double yToolCoordMax = 0; 	// the max y coordinate of tool at the examined z coordinate
+			
+			double yToolCoordMin = ySpindle - toolLocalRadius; 	// the min y coordinate of tool at the examined z coordinate
+			if (yToolCoordMin < yBilletMin) continue;
+			
+			double yToolCoordMax = ySpindle + toolLocalRadius; 	// the max y coordinate of tool at the examined z coordinate
+			if (yToolCoordMax > yBilletMax) continue;
 			
 			double zToolElCoord = zToolNoseCoord;	// z coordinate of the element to examine if it machines the billet
 			
@@ -232,7 +249,7 @@ public class MRRCalculator {
 								mr[line] += 1;
 								
 								//Add the machined element to the tool usage
-								radialToolEl = (int)(Math.sqrt(radialDistFromToolCentre)/elemSize);
+								radialToolEl = (int)(radialDistFromToolCentre/elemSize);
 								cuttingToolAxialProfile.get(zToolEl).addMaterialRemoved(axialRatio);
 								cuttingToolRadialProfile.get(radialToolEl).addMaterialRemoved(radialRatio);
 								
@@ -266,6 +283,8 @@ public class MRRCalculator {
 		kpis.setMrr(mrr);
 		kpis.setPart(part);
 		kpis.setTools(usedCuttingTools);
+		
+//		IoUtils.writeFile("exectime.csv", executionTime);
 		return kpis;
 	}
 

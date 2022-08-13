@@ -21,6 +21,13 @@ import org.jzy3d.plot3d.rendering.lights.Light;
 
 import uk.ac.cf.milling.utils.db.SettingUtils;
 
+/**
+ * 3D plotter version 3.<br>
+ * Produces a point cloud showing the surfaces of the part. Each point colour is<br>
+ * specified by its z-axis position.
+ * @author Theocharis Alexopoulos
+ *
+ */
 public class Plotter3D_V3 {
 	public static JPanel getChartPanel(boolean[][][] part) {
 

@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Convenience methods for reading and writing csv files and reports to disk
  * @author Theocharis Alexopoulos
  *
  */
@@ -403,6 +404,23 @@ public class IoUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Writes to the specified output file deleting previous contents
+	 * @param outputFilePath - the filepath of the output file
+	 * @param kpis - the KPIs calculated from GCode simulation
+	 */
+	/**
+	 * @param filePath - the filepath of the output file
+	 * @param data - an array of type long to write in the file
+	 */
+	public static void writeFile(String filePath, long[] data){
+		StringBuilder sb = new StringBuilder();
+		for (long l:data) {
+			sb.append(l + "\n");
+		}
+		writeFile(filePath, sb.toString());
 	}
 
 

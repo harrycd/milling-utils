@@ -9,13 +9,13 @@ import uk.ac.cf.milling.db.SettingsDB;
 import uk.ac.cf.milling.objects.SettingsSingleton;
 
 /**
+ * Methods to read and set simulator settings.
  * @author Theocharis Alexopoulos
  *
  */
 public class SettingUtils {
 	//Kept as reference to avoid checking for correct spelling
 	public static String ELEMENT_SIZE = "elementSize";
-	public static String TIME_STEP = "timeStep";
 	
 	/**
 	 * @param settingId - the setting to retrieve
@@ -68,14 +68,6 @@ public class SettingUtils {
 	
 	public static double getElementSize(){
 		return Double.parseDouble(getSetting(ELEMENT_SIZE));
-	}
-	
-	public static double getTimeStep(){
-		return Double.parseDouble(getSetting(TIME_STEP));
-	}
-
-	public static void setTimeStep(String timeStep){
-		updateSetting(TIME_STEP, timeStep);
 	}
 	
 }

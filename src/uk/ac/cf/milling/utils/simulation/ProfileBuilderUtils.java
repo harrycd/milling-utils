@@ -10,6 +10,8 @@ import uk.ac.cf.milling.objects.CuttingToolProfile;
 import uk.ac.cf.milling.utils.db.SettingUtils;
 
 /**
+ * Methods to generate the cutting tool profile.
+ * Implementations for end mill, ball nose mill and chamfer cutter.
  * @author Theocharis Alexopoulos
  *
  */

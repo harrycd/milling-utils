@@ -11,6 +11,7 @@ import uk.ac.cf.milling.objects.SimulatorConfig;
 import uk.ac.cf.milling.utils.db.SettingUtils;
 
 /**
+ * Custom G-Code translation methods. Also parts of legacy code.
  * @author Theocharis Alexopoulos
  * This class contains methods for utilities needed to translate the GCode file information in String
  * format to analysis file information. Analysis file contains for every timestep the position of the
@@ -66,7 +67,7 @@ public class GCodeAnalyser {
 	 */
 	public KPIs analyseGCode(List<String[]> blocks, SimulatorConfig config){
 		KPIs kpis = new KPIs();
-		double timeStep = SettingUtils.getTimeStep();
+		double timeStep = 1;//SettingUtils.getTimeStep();
 
 		double xStart = 0.0; // initial X coordinate of tool		
 		double yStart = 0.0; // initial Y coordinate of tool

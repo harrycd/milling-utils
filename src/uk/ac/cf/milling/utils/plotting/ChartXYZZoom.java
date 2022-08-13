@@ -16,6 +16,8 @@ import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
 
 /**
+ * Adds 3D zoom functionality to 3D graphs.<br>
+ * Integration to 2D graphs (for X,Y zoom) not tested.
  * @author Theocharis Alexopoulos
  *
  */

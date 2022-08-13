@@ -11,6 +11,7 @@ import uk.ac.cf.milling.db.CuttingToolDB;
 import uk.ac.cf.milling.objects.CuttingTool;
 
 /**
+ * Methods accessing persistence layer for Carousel pocket creation and management.
  * @author Theocharis Alexopoulos
  *
  */

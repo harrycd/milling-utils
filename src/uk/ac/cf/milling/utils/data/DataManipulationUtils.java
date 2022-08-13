@@ -12,6 +12,7 @@ import uk.ac.cf.milling.objects.KPIs;
 import uk.ac.cf.milling.utils.db.SettingUtils;
 
 /**
+ * Core class for data processing required by input module.
  * @author Theocharis Alexopoulos
  *
  */

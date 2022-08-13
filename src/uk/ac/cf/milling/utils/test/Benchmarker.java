@@ -4,10 +4,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
+/**
+ * Methods to test simulator's execution time.
+ * @author Theocharis Alexopoulos
+ *
+ */
 public class Benchmarker {
-	
-	
-	
 	
 	/**
 	 * @param supplier - The method that execution time is calculated

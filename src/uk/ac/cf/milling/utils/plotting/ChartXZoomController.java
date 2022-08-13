@@ -14,8 +14,8 @@ import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.MouseListener;
 
 /**
+ * Adds X axis zoom functionality (useful in 2D graphs).
  * @author Theocharis Alexopoulos
- * @date 1 Sep 2020
  *
  */
 public class ChartXZoomController extends AbstractCameraController implements MouseListener {

@@ -20,8 +20,8 @@ import weka.core.Instance;
 import weka.core.Instances;
 
 /**
+ * Contains utility methods to create, train and manage ML models.
  * @author Theocharis Alexopoulos
- * @date 23 Jan 2022
  *
  */
 public class Models {

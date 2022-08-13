@@ -4,21 +4,23 @@
 package uk.ac.cf.milling.utils.test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.cf.milling.utils.data.DataManipulationUtils;
 import weka.classifiers.Classifier;
+import weka.classifiers.functions.SimpleLinearRegression;
 import weka.classifiers.meta.Bagging;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.SerializationHelper;
 import weka.core.converters.ConverterUtils.DataSink;
 import weka.core.converters.ConverterUtils.DataSource;
 
 /**
+ * Thesis results verification tests. Generate a master dataset for other tests.
  * @author Theocharis Alexopoulos
- * @date 21 Jan 2022
  *
  */
 public class WekaTest001 {
@@ -28,21 +30,45 @@ public class WekaTest001 {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-//		DataSource source = new DataSource("C:\\Users\\Alexo\\Desktop\\wekatest.csv");
+		
+		//Add all datafiles here so it is easier to refer to.
+		Map<String, String> data = new HashMap<>();
+		data.put("A0935", "C:\\Users\\Alexo\\OneDrive\\PhD - Work\\NC and Data Files\\CylWearTest_180510\\posi_20180510_0935.csv_clean_smooth.csv");
+		data.put("A1009", "C:\\Users\\Alexo\\OneDrive\\PhD - Work\\NC and Data Files\\CylWearTest_180510\\posi_20180510_1009.csv_clean_smooth.csv");
+		data.put("A1043", "C:\\Users\\Alexo\\OneDrive\\PhD - Work\\NC and Data Files\\CylWearTest_180510\\posi_20180510_1043.csv_clean_smooth.csv");
+		data.put("A1117", "C:\\Users\\Alexo\\OneDrive\\PhD - Work\\NC and Data Files\\CylWearTest_180510\\posi_20180510_1117.csv_clean_smooth.csv");
+		data.put("A1149", "C:\\Users\\Alexo\\OneDrive\\PhD - Work\\NC and Data Files\\CylWearTest_180510\\posi_20180510_1149.csv_clean_smooth.csv");
+		data.put("A1222", "C:\\Users\\Alexo\\OneDrive\\PhD - Work\\NC and Data Files\\CylWearTest_180510\\posi_20180510_1222.csv_clean_smooth.csv");
+		data.put("B0922", "C:\\Users\\Alexo\\OneDrive\\PhD - Work\\NC and Data Files\\CK041044\\posi_20180531_0922.csv_clean_smooth.csv");
+		data.put("B0958", "C:\\Users\\Alexo\\OneDrive\\PhD - Work\\NC and Data Files\\CK041044\\posi_20180531_0958.csv_clean_smooth.csv");
+		data.put("B1034", "C:\\Users\\Alexo\\OneDrive\\PhD - Work\\NC and Data Files\\CK041044\\posi_20180531_1034.csv_clean_smooth.csv");
+		data.put("B1109", "C:\\Users\\Alexo\\OneDrive\\PhD - Work\\NC and Data Files\\CK041044\\posi_20180531_1109.csv_clean_smooth.csv");
+		
+		
+		//iterate over all combinations
+		for (Map.Entry<String, String> entry : data.entrySet()) {
+	        System.out.println(entry.getKey() + ":" + entry.getValue());
+	        runExperiment(data.get("A0935"), entry.getValue(), "train_A0935-test_" +  entry.getKey());
+	        
+	    }
 		
 		
 		
-		Instances trainSet = prepareInstances("C:\\Users\\Alexo\\OneDrive\\PhD - Work\\NC and Data Files\\CylWearTest_180510\\posi_20180510_0935.csv_clean_smooth_data.csv");
-		Instances testSet = prepareInstances("C:\\Users\\Alexo\\OneDrive\\PhD - Work\\NC and Data Files\\CK041044\\posi_20180531_1109.csv_clean_smooth_data.csv");
+		
+	}
+	
+	static void runExperiment(String trainSetFilePath, String testSetFilePath, String resultsFilePath) throws Exception {
+		Instances trainSet = prepareInstances(trainSetFilePath);
+		Instances testSet = prepareInstances(testSetFilePath);
 		
 		Classifier model = trainBaggingModel(trainSet);
+//		Classifier model = trainSimpleLinearRegressionModel(trainSet);
 		
 		// Save and retrieve the model
-		SerializationHelper.write("C:\\Users\\Alexo\\Desktop\\model", model);
-		Classifier clsf = (Classifier) SerializationHelper.read("C:\\Users\\Alexo\\Desktop\\model");
+		//SerializationHelper.write("C:\\Users\\Alexo\\Desktop\\model", model);
+		//Classifier clsf = (Classifier) SerializationHelper.read("C:\\Users\\Alexo\\Desktop\\model");
 		
-		writeResults(testSet, clsf, "Train.0935-Test.1109.test");
-		
+		writeResults(testSet, model, resultsFilePath);
 	}
 
 	/**
@@ -50,7 +76,7 @@ public class WekaTest001 {
 	 * @return
 	 * @throws Exception
 	 */
-	private static Instances prepareInstances(String filepath) throws Exception {
+	public static Instances prepareInstances(String filepath) throws Exception {
 		// Create the list of attributes to keep in Instances (SL and MRR)
 		List<String> relevantAttributes = new ArrayList<String>();
 		relevantAttributes.add("SL");
@@ -80,6 +106,13 @@ public class WekaTest001 {
 		
 	}
 	
+	static SimpleLinearRegression trainSimpleLinearRegressionModel(Instances data) throws Exception {
+		SimpleLinearRegression slr = new SimpleLinearRegression();
+		slr.buildClassifier(data);
+		
+		return slr;
+	}
+	
 	private static void writeResults(Instances instances, Classifier clsf, String filename) throws Exception {
 		// Add the results to the Instances
 		int instCount = instances.numInstances();
@@ -98,11 +131,11 @@ public class WekaTest001 {
 			instances.set(i, instance);
 		}
 		
-		DataSink.write("C:\\Users\\Alexo\\Desktop\\" + filename + ".csv", instances);
+		DataSink.write("C:\\Users\\Alexo\\Desktop\\VMC\\" + filename + ".csv", instances);
 	}
 	
 	/**
-	 * Creates a new Instances with containing only the Attributes in the List
+	 * Creates a new Instances containing only the Attributes in the List
 	 * 
 	 * @param instances - the instances to extract attributes from
 	 * @param attributesToKeep- the List of attributes to keep
@@ -145,4 +178,5 @@ public class WekaTest001 {
 			data.set(i, inst);
 		}
 	}
+	
 }

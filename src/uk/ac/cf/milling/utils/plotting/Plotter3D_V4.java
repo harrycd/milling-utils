@@ -19,6 +19,12 @@ import org.jzy3d.plot3d.rendering.canvas.Quality;
 
 import uk.ac.cf.milling.utils.db.SettingUtils;
 
+/**
+ * 3D plotter version 4.<br>
+ * Produces a wire diagram showing the edges of the part.
+ * @author Theocharis Alexopoulos
+ *
+ */
 public class Plotter3D_V4 {
 	public static JPanel getChartPanel(boolean[][][] part) {
 

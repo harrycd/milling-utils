@@ -51,6 +51,7 @@ import com.willwinder.universalgcodesender.visualizer.LineSegment;
 import uk.ac.cf.milling.utils.db.SettingUtils;
 
 /**
+ * Adaptor methods to connect UGS library to the simulator's input module
  * @author Theocharis Alexopoulos
  *
  */

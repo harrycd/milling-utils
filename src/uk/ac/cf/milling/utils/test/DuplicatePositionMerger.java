@@ -8,6 +8,7 @@ import uk.ac.cf.milling.utils.data.DataManipulationUtils;
 import uk.ac.cf.milling.utils.data.IoUtils;
 
 /**
+ * Verification tests for dealing with duplicate monitoring data.
  * @author Theocharis Alexopoulos
  *
  */

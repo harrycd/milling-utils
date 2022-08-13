@@ -4,6 +4,7 @@
 package uk.ac.cf.milling.utils.data;
 
 /**
+ * Data type conversion - convenience methods.
  * @author Theocharis Alexopoulos
  * @date 23 Sep 2020
  *

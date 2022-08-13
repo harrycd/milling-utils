@@ -10,6 +10,7 @@ import uk.ac.cf.milling.db.CuttingToolDB;
 import uk.ac.cf.milling.objects.CuttingTool;
 
 /**
+ * Methods accessing persistence layer for CuttingTool creation and management.
  * @author Theocharis Alexopoulos
  *
  */

@@ -11,6 +11,7 @@ import uk.ac.cf.milling.objects.CuttingTool;
 import uk.ac.cf.milling.objects.CuttingToolProfile;
 
 /**
+ * Methods accessing persistence layer for CuttingToolProfiles creation and management.
  * @author Theocharis Alexopoulos
  *
  */

@@ -8,6 +8,8 @@ import uk.ac.cf.milling.objects.SimulatorConfig;
 import uk.ac.cf.milling.utils.db.SettingUtils;
 
 /**
+ * Methods to maintain process performance and statistics and to provide <br>
+ * required data for the output interface reports.
  * @author Theocharis Alexopoulos
  *
  */

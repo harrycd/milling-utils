@@ -9,6 +9,7 @@ import uk.ac.cf.milling.db.MaterialDB;
 import uk.ac.cf.milling.objects.Material;
 
 /**
+ * Methods accessing persistence layer for Material creation and management.
  * @author Theocharis Alexopoulos
  *
  */

@@ -15,6 +15,7 @@ import uk.ac.cf.milling.utils.data.IoUtils;
 import uk.ac.cf.milling.utils.db.NcUtils;
 
 /**
+ * Top level methods to start a simulator run.
  * @author Theocharis Alexopoulos
  *
  */

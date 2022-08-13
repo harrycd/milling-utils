@@ -6,6 +6,8 @@ package uk.ac.cf.milling.utils.simulation;
 import uk.ac.cf.milling.objects.KPIs;
 
 /**
+ * Under development!<br> 
+ * Methods to check hardware specs before simulator initialisation.
  * @author Theocharis Alexopoulos
  *
  */

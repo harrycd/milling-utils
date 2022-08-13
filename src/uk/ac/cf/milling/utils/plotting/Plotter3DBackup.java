@@ -14,6 +14,7 @@ import uk.ac.cf.milling.objects.Billet;
 import uk.ac.cf.milling.utils.db.SettingUtils;
 
 /**
+ * Contains legacy plotting methods used up to version 0.4 of the simulator.
  * @author Theocharis Alexopoulos
  *
  */

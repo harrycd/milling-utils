@@ -18,6 +18,7 @@ import org.jzy3d.plot3d.primitives.Point;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 
 /**
+ * Legacy methods to reproduce PhD initial graphical representations.
  * @author Theocharis Alexopoulos
  *
  */

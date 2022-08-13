@@ -18,6 +18,7 @@ import uk.ac.cf.milling.utils.db.CarouselUtils;
 import uk.ac.cf.milling.utils.db.NcUtils;
 
 /**
+ * Methods for real time response to web application requests.
  * @author Theocharis Alexopoulos
  *
  */

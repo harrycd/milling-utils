@@ -6,6 +6,7 @@ package uk.ac.cf.milling.utils.db;
 import uk.ac.cf.milling.db.DB;
 
 /**
+ * High level access to database initialisation.
  * @author Theocharis Alexopoulos
  *
  */

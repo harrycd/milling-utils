@@ -13,6 +13,7 @@ import javax.swing.border.Border;
 import org.jzy3d.chart.Chart;
 import org.jzy3d.chart.factories.AWTChartComponentFactory;
 import org.jzy3d.chart.factories.IChartComponentFactory;
+import org.jzy3d.colors.Color;
 import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.primitives.Scatter;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
@@ -21,14 +22,16 @@ import uk.ac.cf.milling.objects.Billet;
 import uk.ac.cf.milling.utils.db.SettingUtils;
 
 /**
+ * 3D plotter version 1.<br>
+ * Produces a scatter chart showing all part elements in black colour.
  * @author Theocharis Alexopoulos
  *
  */
 public class Plotter3D_V1 {
 
 	
-	public static JPanel getChartPanel(boolean[][][] part2plot, Billet billet2plot) {
-		return getChartPanel(getChart(part2plot, billet2plot));
+	public static JPanel getChartPanel(boolean[][][] part2plot) {
+		return getChartPanel(getChart(part2plot));
 	}
 	
 	private static JPanel getChartPanel(Chart chart) {
@@ -42,24 +45,19 @@ public class Plotter3D_V1 {
 		return chartPanel;
 	}
 	
-	private static Chart getChart(boolean[][][] part2plot, Billet billet2plot) {
+	private static Chart getChart(boolean[][][] part2plot) {
 
 		int sizeX = part2plot.length;
 		int sizeY = part2plot[0].length;
 		int sizeZ = part2plot[0][0].length;
 		Coord3d[] coordinates = new Coord3d[(sizeX*sizeY*sizeZ)];
+		Color[] colors = new Color[(sizeX*sizeY*sizeZ)]; 
 		int counter = 0;
 
 		float xf = 0.0f;
 		float yf = 0.0f;
 		float zf = 0.0f;
 		
-		float xBilletMin = (float) billet2plot.getXBilletMin();
-		float yBilletMin = (float) billet2plot.getYBilletMin();
-		float zBilletMin = (float) billet2plot.getZBilletMin();
-		float xBilletMax = (float) billet2plot.getXBilletMax();
-		float yBilletMax = (float) billet2plot.getYBilletMax();
-		float zBilletMax = (float) billet2plot.getZBilletMax();
 		float elemSize = (float) SettingUtils.getElementSize();
 		
 		//Generate the array of points to display
@@ -67,10 +65,13 @@ public class Plotter3D_V1 {
 			for (int y = 0; y < sizeY; y++){
 				for (int z = 0; z < sizeZ; z++){
 					if (!part2plot[x][y][z]){
-						xf = xBilletMin + x * elemSize;
-						yf = yBilletMin + y * elemSize;
-						zf = zBilletMin + z * elemSize;
+						xf = x * elemSize;
+						yf = y * elemSize;
+						zf = z * elemSize;
 						coordinates[counter] = new Coord3d(xf,yf,zf);
+						
+						colors[counter] = new Color(0.5f, 0.5f, z/(float)sizeZ);
+						
 						counter++;
 					}
 				}
@@ -85,19 +86,27 @@ public class Plotter3D_V1 {
 			coords[i] = coordinates[i];
 		}
 		coordinates = null;
-		Scatter scatter = new Scatter(coords);
+		Scatter scatter = new Scatter(coords, colors);
 
 		//Set the correct bounds so the plot is not distorted (graph always a box)
-		float boxSize = Math.max((xBilletMax - xBilletMin), Math.max(yBilletMax - yBilletMin, zBilletMax - zBilletMin));
-		scatter.getBounds().setXmin( xBilletMin );
-		scatter.getBounds().setXmax( xBilletMin + boxSize );
-		scatter.getBounds().setYmin( yBilletMin );
-		scatter.getBounds().setYmax( yBilletMin + boxSize );
-		scatter.getBounds().setZmin( zBilletMin );
-		scatter.getBounds().setZmax( zBilletMin + boxSize );
+//		float boxSize = Math.max((xBilletMax - xBilletMin), Math.max(yBilletMax - yBilletMin, zBilletMax - zBilletMin));
+//		scatter.getBounds().setXmin( xBilletMin );
+//		scatter.getBounds().setXmax( xBilletMin + boxSize );
+//		scatter.getBounds().setYmin( yBilletMin );
+//		scatter.getBounds().setYmax( yBilletMin + boxSize );
+//		scatter.getBounds().setZmin( zBilletMin );
+//		scatter.getBounds().setZmax( zBilletMin + boxSize );
+
+		float boxSize = Math.max(sizeX, Math.max(sizeY, sizeZ));
+		scatter.getBounds().setXmin( 0 );
+		scatter.getBounds().setXmax( boxSize * elemSize );
+		scatter.getBounds().setYmin( 0 );
+		scatter.getBounds().setYmax( boxSize * elemSize );
+		scatter.getBounds().setZmin( 0 );
+		scatter.getBounds().setZmax( boxSize * elemSize);
 
 		//set the width of each point so it is visible
-		scatter.setWidth(1);
+		scatter.setWidth(0.01f);
 		Chart chart = AWTChartComponentFactory.chart(Quality.Nicest, IChartComponentFactory.Toolkit.newt);
 		chart.getScene().add(scatter);
 		chart.getAxeLayout().setXAxeLabel("X");

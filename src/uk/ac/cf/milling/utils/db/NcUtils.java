@@ -9,6 +9,7 @@ import uk.ac.cf.milling.db.NcDB;
 import uk.ac.cf.milling.objects.Nc;
 
 /**
+ * Methods accessing persistence layer for Nc object creation and management.
  * @author Theocharis Alexopoulos
  *
  */

@@ -6,6 +6,7 @@ package uk.ac.cf.milling.utils.plotting;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -20,6 +21,8 @@ import org.jzy3d.chart2d.Chart2d;
 import org.jzy3d.colors.Color;
 import org.jzy3d.maths.BoundingBox3d;
 import org.jzy3d.maths.Coord2d;
+import org.jzy3d.maths.Histogram;
+import org.jzy3d.plot2d.primitives.Histogram2d;
 import org.jzy3d.plot2d.primitives.Serie2d;
 import org.jzy3d.plot2d.primitives.Serie2d.Type;
 import org.jzy3d.plot3d.primitives.axes.layout.providers.SmartTickProvider;
@@ -108,6 +111,49 @@ public class Plotter2D {
 		JPanel chartPanel = getChartPanel(chart); 
 		PlotterUtils.registerChart(chartPanel, chart);
 		chartPanel.putClientProperty("series", chart.getSerie(seriesTitle, null));
+		chartPanel.putClientProperty("dataX", dataX);
+		chartPanel.putClientProperty("dataY", dataY);
+		return chartPanel;
+	}
+	
+	/**
+	 * @param dataX - A floats array with equally spread values. The number of
+	 * array elements defines the number (and width) of bars 
+	 * @param dataY - The height of the corresponding bar
+	 * @return A panel that contains the 2D histogram
+	 */
+	public static JPanel get2dHistogramPanel(float[] dataX, float[] dataY, String xAxisLabel, String yAxisLabel) {
+		
+		// Build the dataset that should be used to create the histogram
+		// Ridiculous method follows (due to the way histograms are built)
+		// The bins are manually generated and values are repeatedly added
+		// to each bin to create the desired result.
+		
+		int bins = dataX.length - 1;
+		float barWidth = dataX[1] - dataX[0];
+		float histMax = bins * barWidth;
+		float histMin = dataX[0];
+		
+		List<Float> values = new ArrayList<Float>();
+		for (int bin = 0; bin < bins; bin++) {
+			float valueToAdd = dataX[bin]+barWidth/2;
+			
+			for (int i = 0; i < dataY[bin]; i++) {
+				values.add(valueToAdd);
+			}
+		}
+		
+		Histogram hist = new Histogram(histMin, histMax, bins );
+		hist.add(values);
+		
+		Histogram2d histogram = new Histogram2d(hist, xAxisLabel, yAxisLabel);
+        histogram.getDrawable().setWireframeColor(Color.BLACK);
+
+        Chart2d chart = new Chart2d();
+        histogram.addTo(chart);
+		
+		JPanel chartPanel = getChartPanel(chart); 
+		PlotterUtils.registerChart(chartPanel, chart);
 		chartPanel.putClientProperty("dataX", dataX);
 		chartPanel.putClientProperty("dataY", dataY);
 		return chartPanel;

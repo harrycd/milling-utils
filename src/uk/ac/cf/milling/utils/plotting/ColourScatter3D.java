@@ -22,8 +22,8 @@ import org.jzy3d.plot3d.primitives.Scatter;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 
 /**
+ * Methods for advanced multicolour scatter plotting.
  * @author Theocharis Alexopoulos
- * @date 31 Aug 2020
  *
  */
 public class ColourScatter3D {
