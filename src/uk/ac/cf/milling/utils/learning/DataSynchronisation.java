@@ -22,11 +22,11 @@ import com.util.DistanceFunction;
 import com.util.DistanceFunctionFactory;
 
 import uk.ac.cf.milling.objects.CuttingTool;
-import uk.ac.cf.milling.objects.LearningSet;
+import uk.ac.cf.milling.objects.MLModel;
 import uk.ac.cf.milling.utils.data.DataManipulationUtils;
 import uk.ac.cf.milling.utils.data.IoUtils;
 import uk.ac.cf.milling.utils.db.CarouselUtils;
-import uk.ac.cf.milling.utils.db.LearningSetUtils;
+import uk.ac.cf.milling.utils.db.MLModelUtils;
 
 /**
  * Core methods to syncronise data with DTW

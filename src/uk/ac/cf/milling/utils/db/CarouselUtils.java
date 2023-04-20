@@ -49,6 +49,24 @@ public class CarouselUtils {
 	}
 	
 	/**
+	 * Get the cutting tools that are loaded into the carousel at the provided positions 
+	 * @param positions - The carousel position IDs to get the CuttingTool data from
+	 * @return a List<CuttingTool> containing the CuttingTools found in the provided positions
+	 */
+	public static List<CuttingTool> getCarouselPocketTools(int[] positions){
+		List<CuttingTool> cuttingTools = new ArrayList<CuttingTool>();
+		for (int position : positions) {
+			CuttingTool tool = getCarouselPocketTool(position);
+			if (tool != null) {
+				cuttingTools.add(tool);
+			}
+		}
+		
+		return cuttingTools;
+	}
+	
+	
+	/**
 	 * @param toolId - the id of the tool to search for
 	 * @return the pocket number of the carousel that the tool was found (0 if not found)
 	 */

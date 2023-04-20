@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -216,16 +217,30 @@ public class IoUtils {
 			// Read the CSV file and append the new column at the end of each line
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String[] newFile = new String[column.length];
-			int i = 0;
+			
+			//Check if header exists
+			String headersLine = br.readLine(); //parses headers into a String array
+			String[] headers = headersLine.split(",");
+			
+			if (Arrays.asList(headers).contains(column[0])) {
+				//New header already exists so add a counter at the end of the name
+				int counter = 1;
+				while (Arrays.asList(headers).contains(column[0] + counter)) {
+					counter++;
+				}
+				column[0] = column[0] + counter;
+			}
+			newFile[0] = headersLine + "," + column[0] + "\n";
+			
+			// Copy the rest of the values
+			int i = 1;
 
 			for (String line = br.readLine(); line != null; line = br.readLine(), i++){
 				newFile[i] = line + "," + column[i] + "\n"; 
 			}
 			br.close();
 
-			System.out.println("File lines: " + i + " Column lines: " + column.length);
-
-			//write the new file
+			// Write the new file
 			BufferedWriter bw = new BufferedWriter(new FileWriter(filePath));
 			for (int it = 0; it < i; it++){
 				bw.write(newFile[it]);
@@ -243,14 +258,14 @@ public class IoUtils {
 	/**
 	 * Adds a column to the end of the specified CSV file
 	 * @param filePath - The path of the CSV file that the column will be added
-	 * @param title - Title of the newly inserted column
+	 * @param header - Header of the newly inserted column
 	 * @param data - The data of the new column. Every cell of the array is a new line
 	 */
-	public static void addColumnToCSVFile(String filePath, String title, double[] data){
+	public static void addColumnToCSVFile(String filePath, String header, double[] data){
 		int fileLines = data.length + 1;
 		String[] column = new String[fileLines];
 
-		column[0] = title;
+		column[0] = header;
 		for (int i = 1; i < fileLines; i++){
 			column[i] = String.valueOf(data[i-1]);
 		}
@@ -261,14 +276,14 @@ public class IoUtils {
 	/**
 	 * Adds a column to the end of the specified CSV file
 	 * @param filePath - The path of the CSV file that the column will be added
-	 * @param title - Title of the newly inserted column
+	 * @param header - Header of the newly inserted column
 	 * @param data - The data of the new column. Every cell of the array is a new line
 	 */
-	public static void addColumnToCSVFile(String filePath, String title, long[] data){
+	public static void addColumnToCSVFile(String filePath, String header, long[] data){
 		int fileLines = data.length + 1;
 		String[] column = new String[fileLines];
 
-		column[0] = title;
+		column[0] = header;
 		for (int i = 1; i < fileLines; i++){
 			column[i] = String.valueOf(data[i-1]);
 		}
@@ -421,6 +436,20 @@ public class IoUtils {
 			sb.append(l + "\n");
 		}
 		writeFile(filePath, sb.toString());
+	}
+	
+	
+	/**
+	 * Copies the source file to the provided destination. If destination exists, it overwrites the file.
+	 * @param source - the source file path
+	 * @param destination - the destination file path
+	 */
+	public static void copyFile(String source, String destination) {
+		try {
+			Files.copy(Paths.get(source), Paths.get(destination), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 

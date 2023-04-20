@@ -4,6 +4,7 @@
 package uk.ac.cf.milling.utils.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -685,20 +686,30 @@ public class DataManipulationUtils {
 	
 	/**
 	 * @param values - a double array with original values
-	 * @param averagingPeriod - number of samples used to calculate the average
+	 * @param windowSize - number of samples used to calculate the average
 	 * @return a double array with the smoothened values
 	 */
-	public static double[] getSimpleMovingAverage(double[] values, int averagingPeriod) {
+	public static double[] getSimpleMovingAverage(double[] values, int windowSize) {
 		int length = values.length;
 		double[] sma = new double[length];
 		//Calculate the sma
-		for (int i = averagingPeriod-1; i < length; i++){
-			for (int j = 0; j < averagingPeriod; j++){
+		for (int i = windowSize-1; i < length; i++){
+			for (int j = 0; j < windowSize; j++){
 				sma[i] += values[i-j];
 			}
-			sma[i] /= averagingPeriod;
+			sma[i] /= windowSize;
 		}
 		return sma;
+	}
+	
+	
+	/**
+	 * Finds and returns the unique values contained in the provided array
+	 * @param arr - the array to check for unique values
+	 * @return - a double[] array containing the unique values
+	 */
+	public static double[] getDistinctValues(double[] arr) {
+		return Arrays.stream(arr).distinct().toArray();
 	}
 
 }

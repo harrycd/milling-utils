@@ -49,7 +49,7 @@ public class SimulatorUtils {
 				System.out.print("Cleaning CSV Data File...");
 		String csvFilePath = config.getInputFilePath();
 		String cleanData = DataManipulationUtils.getCleanFromDuplicateCoordinatesData(csvFilePath);
-		csvFilePath += "_clean.csv";
+		csvFilePath = csvFilePath.substring(0, csvFilePath.length() - 4) + "_clean.csv";
 		IoUtils.writeFile(csvFilePath, cleanData);
 				System.out.println("done");
 				
@@ -70,10 +70,17 @@ public class SimulatorUtils {
 		KPIUtils.updateKPIs(kpis, MRRCalculator.calculateMRR(kpis, config));
 				System.out.println("done");
 				
-				// Add MRR at the analysis file
+				// Add MRR into the analysis file
 				System.out.println("Adding MRR to analysis file");
+		IoUtils.copyFile(csvFilePath, csvFilePath.substring(0, csvFilePath.length() - 4) + "_data.csv");
+		csvFilePath = csvFilePath.substring(0, csvFilePath.length() - 4) + "_data.csv";
 		IoUtils.addColumnToCSVFile(csvFilePath, "MR", kpis.getMr());
 		IoUtils.addColumnToCSVFile(csvFilePath, "MRR", kpis.getMrr());
+				System.out.println("done");
+				
+				//TODO Add derivative data into the analysis file
+				System.out.println("Calculating derivative data");
+		DerivativeCalculator.addDerivativeData(csvFilePath, config.getBillet().getMaterialId());
 				System.out.println("done");
 				
 				// Save the file path of the analysis file
